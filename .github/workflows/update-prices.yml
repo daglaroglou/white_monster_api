@@ -21,16 +21,10 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Install Chrome and ChromeDriver
+    - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
       with:
-        chrome-version: latest
-        install-chromedriver: true
-    
-    - name: Verify Chrome installation
-      run: |
-        google-chrome --version
-        chromedriver --version
+        chrome-version: stable
     
     - name: Install dependencies
       run: |
