@@ -1,17 +1,17 @@
 {
-  "last_updated": "2025-10-16T00:00:00",
+  "last_updated": "2025-10-15T22:34:49.186648",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
     "masoutis": {
       "name": "Masoutis",
-      "price": null,
-      "available": false
+      "price": 1.14,
+      "available": true
     },
     "ab": {
       "name": "AB Vassilopoulos",
-      "price": null,
-      "available": false
+      "price": 1.55,
+      "available": true
     },
     "sklavenitis": {
       "name": "Sklavenitis",
@@ -20,28 +20,28 @@
     },
     "kritikos": {
       "name": "Kritikos",
-      "price": null,
-      "available": false
+      "price": 1.15,
+      "available": true
     },
     "mymarket": {
       "name": "MyMarket",
-      "price": null,
-      "available": false
+      "price": 1.52,
+      "available": true
     },
     "galaxias": {
       "name": "Galaxias",
-      "price": null,
-      "available": false
+      "price": 1.52,
+      "available": true
     },
     "bazaar": {
       "name": "Bazaar",
-      "price": null,
-      "available": false
+      "price": 1.14,
+      "available": true
     },
     "marketin": {
       "name": "Market In",
-      "price": null,
-      "available": false
+      "price": 1.55,
+      "available": true
     }
   }
 }
