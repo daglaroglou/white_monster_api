@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,16 +12,31 @@ import chromedriver_autoinstaller
 # Automatically install the correct ChromeDriver version
 chromedriver_autoinstaller.install()
 
-chrome_options = Options()
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-
-driver = webdriver.Chrome(options=chrome_options)
+def get_driver():
+    """Create a new Chrome driver instance with robust options"""
+    chrome_options = Options()
+    chrome_options.add_argument('--headless=new')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    chrome_options.add_argument('--disable-extensions')
+    chrome_options.add_argument('--disable-software-rasterizer')
+    chrome_options.add_argument('--disable-web-security')
+    chrome_options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    return driver
 
 def masoutis(url="https://www.masoutis.gr/categories/item/monster-energy-drink-ultra-zero-500ml?3205614="):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "item-price"))
@@ -35,10 +51,15 @@ def masoutis(url="https://www.masoutis.gr/categories/item/monster-energy-drink-u
             return float(price.split("€")[0])
     except Exception as e:
         print(f"Error fetching Masoutis price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsyktika/Energeiaka-Isotonika/Energeiako-Poto-Energy-Ultra-500ml/p/7289419"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='product-block-price']"))
@@ -60,12 +81,18 @@ def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsy
                 return float(integer_part.get_text(strip=True))
     except Exception as e:
         print(f"Error fetching AB price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsyktika-sodes-energeiaka-pota/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"):
+    driver = None
     try:
+        driver = get_driver()
+        driver.set_page_load_timeout(30)
         driver.get(url)
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CLASS_NAME, "price"))
         )
         page_source = driver.page_source
@@ -79,10 +106,18 @@ def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsykt
             return float(price)
     except Exception as e:
         print(f"Error fetching Sklavenitis price: {e}")
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
     return None
 
 def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "span[class*='ProductDetails_price']"))
@@ -98,10 +133,15 @@ def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/mo
             return float(price)
     except Exception as e:
         print(f"Error fetching Kritikos price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "span.product-full--final-price"))
@@ -117,10 +157,15 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
             return float(price)
     except Exception as e:
         print(f"Error fetching MyMarket price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def galaxias(url="https://galaxias.shop/product/5060337501125"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "span.fs-1.mr-2"))
@@ -136,10 +181,15 @@ def galaxias(url="https://galaxias.shop/product/5060337501125"):
             return float(price)
     except Exception as e:
         print(f"Error fetching Galaxias price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def bazaar(url="https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?search=monster"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "new_price"))
@@ -155,10 +205,15 @@ def bazaar(url="https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?sea
             return float(price)
     except Exception as e:
         print(f"Error fetching Bazaar price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"):
+    driver = None
     try:
+        driver = get_driver()
         driver.get(url)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "p-price"))
@@ -174,6 +229,9 @@ def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energ
             return float(price)
     except Exception as e:
         print(f"Error fetching Market In price: {e}")
+    finally:
+        if driver:
+            driver.quit()
     return None
 
 def main():
@@ -215,8 +273,6 @@ def main():
         json.dump(prices, f, indent=2, ensure_ascii=False)
     
     print("\nPrices saved to prices.json")
-    
-    driver.quit()
 
 if __name__ == "__main__":
     main()
