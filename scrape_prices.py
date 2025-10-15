@@ -8,10 +8,22 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 chrome_options = Options()
-chrome_options.add_argument('--headless')
+chrome_options.add_argument('--headless=new')  # Use new headless mode
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
+chrome_options.add_argument('--disable-software-rasterizer')
+chrome_options.add_argument('--disable-extensions')
+chrome_options.add_argument('--disable-setuid-sandbox')
+chrome_options.add_argument('--single-process')  # Run in single process mode for stability
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+chrome_options.add_argument('--window-size=1920,1080')
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+
+# Additional options for Linux stability
+chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+chrome_options.add_experimental_option('useAutomationExtension', False)
 
 driver = webdriver.Chrome(options=chrome_options)
 
@@ -60,8 +72,9 @@ def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsy
 
 def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsyktika-sodes-energeiaka-pota/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"):
     try:
+        driver.set_page_load_timeout(30)
         driver.get(url)
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.CLASS_NAME, "price"))
         )
         page_source = driver.page_source
@@ -75,6 +88,8 @@ def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsykt
             return float(price)
     except Exception as e:
         print(f"Error fetching Sklavenitis price: {e}")
+        import traceback
+        traceback.print_exc()
     return None
 
 def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"):
