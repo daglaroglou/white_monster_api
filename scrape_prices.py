@@ -2,30 +2,38 @@ import json
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import time
 
-chrome_options = Options()
-chrome_options.add_argument('--headless=new')  # Use new headless mode
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-chrome_options.add_argument('--disable-software-rasterizer')
-chrome_options.add_argument('--disable-extensions')
-chrome_options.add_argument('--disable-setuid-sandbox')
-chrome_options.add_argument('--single-process')  # Run in single process mode for stability
-chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-chrome_options.add_argument('--window-size=1920,1080')
-chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+def create_driver():
+    """Create and return a configured Chrome driver"""
+    chrome_options = Options()
+    chrome_options.add_argument('--headless=new')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-software-rasterizer')
+    chrome_options.add_argument('--disable-extensions')
+    chrome_options.add_argument('--disable-setuid-sandbox')
+    chrome_options.add_argument('--single-process')
+    chrome_options.add_argument('--ignore-certificate-errors')
+    chrome_options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    
+    # Additional options for Linux stability
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.set_page_load_timeout(30)
+    return driver
 
-# Additional options for Linux stability
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-chrome_options.add_experimental_option('useAutomationExtension', False)
-
-driver = webdriver.Chrome(options=chrome_options)
+driver = None
 
 def masoutis(url="https://www.masoutis.gr/categories/item/monster-energy-drink-ultra-zero-500ml?3205614="):
     try:
@@ -72,8 +80,8 @@ def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsy
 
 def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsyktika-sodes-energeiaka-pota/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"):
     try:
-        driver.set_page_load_timeout(30)
         driver.get(url)
+        time.sleep(2)  # Give page time to load
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.CLASS_NAME, "price"))
         )
@@ -188,7 +196,18 @@ def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energ
     return None
 
 def main():
+    global driver
     print("Starting price scraping...")
+    
+    # Create driver
+    try:
+        driver = create_driver()
+        print("Chrome driver initialized successfully")
+    except Exception as e:
+        print(f"Failed to initialize Chrome driver: {e}")
+        import traceback
+        traceback.print_exc()
+        return
     
     prices = {
         "last_updated": datetime.now().isoformat(),
@@ -220,14 +239,19 @@ def main():
             print(f"{store_name}: €{price}")
         else:
             print(f"{store_name}: N/A")
+        
+        time.sleep(1)
     
-    # Save to JSON file
     with open('prices.json', 'w', encoding='utf-8') as f:
         json.dump(prices, f, indent=2, ensure_ascii=False)
     
     print("\nPrices saved to prices.json")
     
-    driver.quit()
+    try:
+        driver.quit()
+        print("Chrome driver closed successfully")
+    except Exception as e:
+        print(f"Error closing driver: {e}")
 
 if __name__ == "__main__":
     main()
