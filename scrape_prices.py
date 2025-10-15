@@ -6,6 +6,10 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
+
+# Automatically install the correct ChromeDriver version
+chromedriver_autoinstaller.install()
 
 chrome_options = Options()
 chrome_options.add_argument('--headless')

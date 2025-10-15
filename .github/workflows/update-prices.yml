@@ -21,15 +21,9 @@ jobs:
       with:
         python-version: '3.13'
     
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v2
-      with:
-        chrome-version: stable
-        install-chromedriver: true
-    
     - name: Install dependencies
       run: |
-        pip install selenium beautifulsoup4
+        pip install selenium beautifulsoup4 chromedriver-autoinstaller
     
     - name: Run price scraper
       run: python scrape_prices.py
