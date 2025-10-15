@@ -24,7 +24,7 @@ jobs:
     - name: Install Chrome and ChromeDriver
       uses: browser-actions/setup-chrome@v1
       with:
-        chrome-version: stable
+        chrome-version: latest
         install-chromedriver: true
     
     - name: Verify Chrome installation
