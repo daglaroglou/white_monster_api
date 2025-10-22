@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 import chromedriver_autoinstaller
 
 # Automatically install the correct ChromeDriver version
-chromedriver_autoinstaller.install()
+chromedriver_autoinstaller.install(path="")
 
 def get_driver():
     """Create a new Chrome driver instance with robust options"""
@@ -70,20 +70,22 @@ def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsy
         price_container = soup.find('div', attrs={'data-testid': 'product-block-price'})
         
         if price_container:
-            integer_part = price_container.find('div', class_='sc-dqia0p-9')
-            decimal_part = price_container.find('sup', class_='sc-dqia0p-10')
-            
-            if integer_part and decimal_part:
-                integer = integer_part.get_text(strip=True)
-                decimal = decimal_part.get_text(strip=True)
-                return float(f"{integer}.{decimal}")
-            elif integer_part:
-                return float(integer_part.get_text(strip=True))
+            all_divs = price_container.find_all('div', attrs={'aria-hidden': 'true'})
+            cents_sup = price_container.find('sup', attrs={'aria-hidden': 'true'})
+
+            if len(all_divs) >= 2 and cents_sup:
+                main_price = all_divs[1].get_text(strip=True)
+                cents = cents_sup.get_text(strip=True)
+                price_str = f"{main_price}.{cents}"
+                return float(price_str)
     except Exception as e:
         print(f"Error fetching AB price: {e}")
     finally:
         if driver:
-            driver.quit()
+            try:
+                driver.quit()
+            except:
+                pass
     return None
 
 def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsyktika-sodes-energeiaka-pota/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"):
