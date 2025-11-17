@@ -31,7 +31,7 @@ https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json
 ### Web Dashboard
 
 ```
-https://daglaroglou.github.io/white_monster_api/
+https://dag.is-a.dev/white_monster_api/
 ```
 
 ### Response Format
@@ -110,3 +110,4 @@ MIT License - Feel free to use and modify as needed.
 This project is for educational purposes. Please respect the terms of service of the websites being scraped. Consider implementing rate limiting and caching to minimize server load.
 
 This is not endorsed by Monster Energy.
+
