@@ -1,17 +1,17 @@
 {
-  "last_updated": "2026-01-13T12:58:55.332939",
+  "last_updated": "2026-01-13T18:38:26.860383",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
     "masoutis": {
       "name": "Masoutis",
-      "price": null,
-      "available": false
+      "price": 1.52,
+      "available": true
     },
     "ab": {
       "name": "AB Vassilopoulos",
-      "price": null,
-      "available": false
+      "price": 1.17,
+      "available": true
     },
     "sklavenitis": {
       "name": "Sklavenitis",
