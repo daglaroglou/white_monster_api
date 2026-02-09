@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-02-03T13:12:49.192238",
+  "last_updated": "2026-02-09T17:51:40.844399",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
@@ -15,17 +15,17 @@
     },
     "sklavenitis": {
       "name": "Sklavenitis",
-      "price": 1.52,
+      "price": 1.12,
       "available": true
     },
     "kritikos": {
       "name": "Kritikos",
-      "price": 1.53,
-      "available": true
+      "price": null,
+      "available": false
     },
     "mymarket": {
       "name": "MyMarket",
-      "price": 1.52,
+      "price": 1.14,
       "available": true
     },
     "galaxias": {
@@ -40,7 +40,7 @@
     },
     "marketin": {
       "name": "Market In",
-      "price": 1.16,
+      "price": 1.1,
       "available": true
     }
   }
