@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-28T13:03:07.437399",
+  "last_updated": "2026-03-28T18:48:08.542990",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
@@ -30,8 +30,8 @@
     },
     "galaxias": {
       "name": "Galaxias",
-      "price": null,
-      "available": false
+      "price": 1.14,
+      "available": true
     },
     "bazaar": {
       "name": "Bazaar",
