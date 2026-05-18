@@ -152,32 +152,60 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
-        # Try multiple selectors/strategies to locate the price
+        # Try multiple selectors/strategies to locate the price, preferring elements styled with crimson
         price_text = None
 
-        # Known selector used previously
+        # Preferred known selector
         el = soup.select_one("span.product-full--final-price")
         if el:
             price_text = el.get_text(strip=True)
 
-        # Common fallback selectors
-        if not price_text:
-            el = soup.select_one("span.product-price, div.product-price, span.price, div.price")
-            if el:
-                price_text = el.get_text(strip=True)
+        # If that looks like a per-unit price (€/L), ignore and continue
+        def is_per_unit(text):
+            if not text:
+                return False
+            lower = text.lower()
+            return any(x in lower for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.'])
 
-        # Generic fallback: find first element containing the euro sign
-        if not price_text:
-            candidate = soup.find(lambda tag: tag.name in ['span', 'div', 'p'] and tag.get_text() and '€' in tag.get_text())
-            if candidate:
-                price_text = candidate.get_text(strip=True)
+        if price_text and is_per_unit(price_text):
+            price_text = None
 
-        # Final fallback: regex on the whole page
+        # Fallback: look for elements that contain a euro sign and prefer crimson-colored ones
+        if not price_text:
+            candidates = soup.find_all(lambda tag: tag.name in ['span', 'div', 'p'] and tag.get_text() and '€' in tag.get_text())
+
+            crimson_candidate = None
+            generic_candidate = None
+            for c in candidates:
+                txt = c.get_text(strip=True)
+                # skip obvious per-unit labels
+                if is_per_unit(txt):
+                    continue
+
+                # check style/class for crimson color
+                style = (c.get('style') or '').lower()
+                classes = ' '.join(c.get('class') or []).lower()
+                if 'crimson' in style or 'crimson' in classes or '#dc143c' in style or 'color:red' in style or 'color:#dc143c' in style:
+                    crimson_candidate = txt
+                    break
+
+                if not generic_candidate:
+                    generic_candidate = txt
+
+            price_text = crimson_candidate or generic_candidate
+
+        # Final fallback: regex on the whole page (avoid matching per-unit by checking surrounding text)
         if not price_text:
             import re
-            m = re.search(r"(\d+[.,]\d{1,2})\s*€", page_source)
-            if m:
+            # find euro amounts not immediately followed by /L or similar
+            for m in re.finditer(r"(\d+[.,]\d{1,2})\s*€", page_source):
+                span_start = max(0, m.start()-20)
+                span_end = min(len(page_source), m.end()+20)
+                context = page_source[span_start:span_end].lower()
+                if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο']):
+                    continue
                 price_text = m.group(1)
+                break
 
         if price_text:
             # Extract numeric part and normalize decimal separator
@@ -186,7 +214,11 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
             if m:
                 price = m.group(1).replace(',', '.')
                 try:
-                    return float(price)
+                    val = float(price)
+                    # sanity: if the price seems unreasonably large (e.g., > 1000), try dividing by 100
+                    if val > 1000:
+                        val = val / 100
+                    return val
                 except ValueError:
                     pass
     except Exception as e:
