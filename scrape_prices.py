@@ -152,23 +152,34 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
-        # Try multiple selectors/strategies to locate the price, preferring elements styled with crimson
+        # Try multiple selectors/strategies to locate the price, preferring the final product price
         price_text = None
 
-        # Preferred known selector
-        el = soup.select_one("span.product-full--final-price")
-        if el:
-            price_text = el.get_text(strip=True)
-
-        # If that looks like a per-unit price (€/L), ignore and continue
         def is_per_unit(text):
             if not text:
                 return False
             lower = text.lower()
-            return any(x in lower for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.'])
+            return any(x in lower for x in [
+                '/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.',
+                'ανά λίτρο', 'ανά lt', 'ανά l', '€/lt', '€/λ', '/λ', 'ανά λ'
+            ])
 
-        if price_text and is_per_unit(price_text):
-            price_text = None
+        # Preferred known selectors
+        preferred_selectors = [
+            "span.product-full--final-price",
+            ".product-full--final-price",
+            "span.product-full--price",
+            "[data-testid='product-price']",
+            "[data-testid='final-price']"
+        ]
+
+        for sel in preferred_selectors:
+            el = soup.select_one(sel)
+            if el:
+                price_text = el.get_text(strip=True)
+                if price_text and not is_per_unit(price_text):
+                    break
+                price_text = None
 
         # Fallback: look for elements that contain a euro sign and prefer crimson-colored ones
         if not price_text:
@@ -202,7 +213,7 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
                 span_start = max(0, m.start()-20)
                 span_end = min(len(page_source), m.end()+20)
                 context = page_source[span_start:span_end].lower()
-                if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο']):
+                if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', 'ανά']):
                     continue
                 price_text = m.group(1)
                 break
@@ -212,9 +223,13 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
             import re
             m = re.search(r"(\d+[.,]?\d*)", price_text)
             if m:
-                price = m.group(1).replace(',', '.')
+                raw_price = m.group(1)
+                price = raw_price.replace(',', '.')
                 try:
                     val = float(price)
+                    # Fix cases like "210" that represent 2.10 (no decimal separator present)
+                    if ('.' not in raw_price and ',' not in raw_price) and 100 <= val < 10000:
+                        val = val / 100
                     # sanity: if the price seems unreasonably large (e.g., > 1000), try dividing by 100
                     if val > 1000:
                         val = val / 100
