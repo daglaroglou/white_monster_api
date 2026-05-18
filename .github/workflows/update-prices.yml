@@ -2,8 +2,8 @@ name: Update Prices
 
 on:
   schedule:
-    # Run every 6 hours
-    - cron: '0 */6 * * *'
+    # Run at 05:00 UTC (08:00 Greece time when UTC+3)
+    - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -12,14 +12,31 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6.0.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run only at 08:00 Europe/Athens
+      shell: pwsh
+      run: |
+        # Windows timezone id for Athens is 'GTB Standard Time'
+        try {
+          $tz = [System.TimeZoneInfo]::FindSystemTimeZoneById("GTB Standard Time")
+        } catch {
+          Write-Host "Could not find 'GTB Standard Time' timezone. Proceeding (no skip)."
+          exit 0
+        }
+        $now = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $tz)
+        Write-Host "Greece time: $now"
+        if ($now.Hour -ne 8) {
+          Write-Host "Not 08:00 in Greece; skipping run."
+          exit 0
+        }
     
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v6.2.0
       with:
-        python-version: '3.13'
+        python-version: '3.14'
     
     - name: Install dependencies
       run: |

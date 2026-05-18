@@ -145,18 +145,50 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
     try:
         driver = get_driver()
         driver.get(url)
+        # Wait for the page to load (wait for body as a generic fallback)
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "span.product-full--final-price"))
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
-        
-        price_element = soup.find('span', class_='product-full--final-price')
-        
-        if price_element:
-            price_text = price_element.get_text(strip=True)
-            price = price_text.replace('€', '').strip().replace(',', '.')
-            return float(price)
+
+        # Try multiple selectors/strategies to locate the price
+        price_text = None
+
+        # Known selector used previously
+        el = soup.select_one("span.product-full--final-price")
+        if el:
+            price_text = el.get_text(strip=True)
+
+        # Common fallback selectors
+        if not price_text:
+            el = soup.select_one("span.product-price, div.product-price, span.price, div.price")
+            if el:
+                price_text = el.get_text(strip=True)
+
+        # Generic fallback: find first element containing the euro sign
+        if not price_text:
+            candidate = soup.find(lambda tag: tag.name in ['span', 'div', 'p'] and tag.get_text() and '€' in tag.get_text())
+            if candidate:
+                price_text = candidate.get_text(strip=True)
+
+        # Final fallback: regex on the whole page
+        if not price_text:
+            import re
+            m = re.search(r"(\d+[.,]\d{1,2})\s*€", page_source)
+            if m:
+                price_text = m.group(1)
+
+        if price_text:
+            # Extract numeric part and normalize decimal separator
+            import re
+            m = re.search(r"(\d+[.,]?\d*)", price_text)
+            if m:
+                price = m.group(1).replace(',', '.')
+                try:
+                    return float(price)
+                except ValueError:
+                    pass
     except Exception as e:
         print(f"Error fetching MyMarket price: {e}")
     finally:
