@@ -1,27 +1,53 @@
 {
-  "last_updated": "2026-05-21T23:17:02.884593",
+  "last_updated": "2026-05-21T20:48:33.611998",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "total": {
     "name": "Average Market Price",
-    "history": []
+    "history": [
+      {
+        "timestamp": "2026-05-21T20:48:33.611998",
+        "price": 1.25,
+        "available_stores": 7
+      }
+    ]
   },
   "stores": {
     "masoutis": {
       "name": "Masoutis",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.14
+        }
+      ]
     },
     "ab": {
       "name": "AB Vassilopoulos",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.14
+        }
+      ]
     },
     "sklavenitis": {
       "name": "Sklavenitis",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.12
+        }
+      ]
     },
     "kritikos": {
       "name": "Kritikos",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.15
+        }
+      ]
     },
     "mymarket": {
       "name": "MyMarket",
@@ -29,15 +55,30 @@
     },
     "galaxias": {
       "name": "Galaxias",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.14
+        }
+      ]
     },
     "bazaar": {
       "name": "Bazaar",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.53
+        }
+      ]
     },
     "marketin": {
       "name": "Market In",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-05-21T20:48:33.611998",
+          "price": 1.55
+        }
+      ]
     }
   }
 }
