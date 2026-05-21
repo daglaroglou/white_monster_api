@@ -2,7 +2,7 @@ name: Update Prices
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -20,31 +20,17 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: '3.14'
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
 
-    - name: Check Athens 08:00 schedule
-      id: athens_time
-      shell: pwsh
-      run: |
-        $utcNow = (Get-Date).ToUniversalTime()
-        $athensTime = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($utcNow, "GTB Standard Time")
-        $shouldRun = $athensTime.Hour -eq 8
-        "run_scrape=$shouldRun" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        Write-Host "UTC now: $utcNow"
-        Write-Host "Athens now: $athensTime"
-        Write-Host "Should run scrape: $shouldRun"
-    
     - name: Run price scraper
-      if: steps.athens_time.outputs.run_scrape == 'True'
       run: python scrape_prices.py
     
     - name: Commit and push if changes
-      if: steps.athens_time.outputs.run_scrape == 'True'
       shell: pwsh
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
