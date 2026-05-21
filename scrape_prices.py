@@ -250,6 +250,85 @@ def get_driver():
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
 
+
+def _extract_mymarket_price(soup, page_source):
+    """Extract MyMarket product price from schema first, then DOM fallbacks."""
+    # Primary strategy: product schema is the most stable source on MyMarket.
+    for script_tag in soup.select("script[type='application/ld+json']"):
+        raw_json = script_tag.get_text(strip=True)
+        if not raw_json:
+            continue
+        try:
+            payload = json.loads(raw_json)
+        except Exception:
+            continue
+
+        nodes = []
+        if isinstance(payload, dict) and isinstance(payload.get("@graph"), list):
+            nodes = [node for node in payload["@graph"] if isinstance(node, dict)]
+        elif isinstance(payload, dict):
+            nodes = [payload]
+        elif isinstance(payload, list):
+            nodes = [node for node in payload if isinstance(node, dict)]
+
+        for node in nodes:
+            if node.get("@type") != "Product":
+                continue
+            offers = node.get("offers")
+            if isinstance(offers, dict):
+                schema_price = offers.get("price")
+                parsed_schema_price = parse_price_to_float(str(schema_price)) if schema_price is not None else None
+                if parsed_schema_price is not None:
+                    return parsed_schema_price
+
+    def is_per_unit(text):
+        if not text:
+            return False
+        lower = text.lower()
+        return any(x in lower for x in [
+            '/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.',
+            'ανά λίτρο', 'ανά lt', 'ανά l', '€/lt', '€/λ', '/λ', 'ανά λ'
+        ])
+
+    # Secondary strategy: known selectors
+    preferred_selectors = [
+        ".product-display-price",
+        ".product-summary .selling-unit-row",
+        "span.product-full--final-price",
+        ".product-full--final-price",
+        "span.product-full--price",
+        "[data-testid='product-price']",
+        "[data-testid='final-price']"
+    ]
+    for sel in preferred_selectors:
+        el = soup.select_one(sel)
+        if not el:
+            continue
+        price_text = el.get_text(strip=True)
+        if not price_text or is_per_unit(price_text):
+            continue
+        split_price_match = re.search(r"€?\s*(\d{1,2})\s+(\d{2})\b", price_text)
+        if split_price_match:
+            combined_price = f"{split_price_match.group(1)}.{split_price_match.group(2)}"
+            return parse_price_to_float(combined_price)
+        parsed = parse_price_to_float(price_text)
+        if parsed is not None:
+            return parsed
+
+    # Final fallback: regex on the page source
+    for m in re.finditer(r"(\d+[.,]\d{1,2})\s*€", page_source):
+        span_start = max(0, m.start() - 20)
+        span_end = min(len(page_source), m.end() + 20)
+        context = page_source[span_start:span_end].lower()
+        if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', 'ανά']):
+            continue
+        parsed = parse_price_to_float(m.group(1))
+        if parsed is not None:
+            return parsed
+
+    return None
+
+
 def masoutis(url="https://www.masoutis.gr/categories/item/monster-energy-drink-ultra-zero-500ml?3205614="):
     driver = None
     try:
@@ -346,6 +425,28 @@ def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/mo
     return None
 
 def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
+    # Playwright is more reliable for MyMarket (Selenium is often served a stripped page).
+    try:
+        from playwright.sync_api import sync_playwright  # type: ignore[reportMissingImports]
+    except Exception:
+        sync_playwright = None
+
+    if sync_playwright is not None:
+        try:
+            with sync_playwright() as playwright:
+                browser = playwright.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto(url, wait_until="domcontentloaded", timeout=60000)
+                page.wait_for_timeout(2500)
+                page_source = page.content()
+                browser.close()
+            soup = BeautifulSoup(page_source, 'html.parser')
+            extracted = _extract_mymarket_price(soup, page_source)
+            if extracted is not None:
+                return extracted
+        except Exception as e:
+            print(f"Warning: Playwright MyMarket fetch failed, falling back to Selenium. ({e})")
+
     driver = None
     try:
         driver = get_driver()
@@ -407,73 +508,7 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
-        # Try multiple selectors/strategies to locate the price, preferring the final product price
-        price_text = None
-
-        def is_per_unit(text):
-            if not text:
-                return False
-            lower = text.lower()
-            return any(x in lower for x in [
-                '/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.',
-                'ανά λίτρο', 'ανά lt', 'ανά l', '€/lt', '€/λ', '/λ', 'ανά λ'
-            ])
-
-        # Preferred known selectors
-        preferred_selectors = [
-            "span.product-full--final-price",
-            ".product-full--final-price",
-            "span.product-full--price",
-            "[data-testid='product-price']",
-            "[data-testid='final-price']"
-        ]
-
-        for sel in preferred_selectors:
-            el = soup.select_one(sel)
-            if el:
-                price_text = el.get_text(strip=True)
-                if price_text and not is_per_unit(price_text):
-                    break
-                price_text = None
-
-        # Fallback: look for elements that contain a euro sign and prefer crimson-colored ones
-        if not price_text:
-            candidates = soup.find_all(lambda tag: tag.name in ['span', 'div', 'p'] and tag.get_text() and '€' in tag.get_text())
-
-            crimson_candidate = None
-            generic_candidate = None
-            for c in candidates:
-                txt = c.get_text(strip=True)
-                # skip obvious per-unit labels
-                if is_per_unit(txt):
-                    continue
-
-                # check style/class for crimson color
-                style = (c.get('style') or '').lower()
-                classes = ' '.join(c.get('class') or []).lower()
-                if 'crimson' in style or 'crimson' in classes or '#dc143c' in style or 'color:red' in style or 'color:#dc143c' in style:
-                    crimson_candidate = txt
-                    break
-
-                if not generic_candidate:
-                    generic_candidate = txt
-
-            price_text = crimson_candidate or generic_candidate
-
-        # Final fallback: regex on the whole page (avoid matching per-unit by checking surrounding text)
-        if not price_text:
-            # find euro amounts not immediately followed by /L or similar
-            for m in re.finditer(r"(\d+[.,]\d{1,2})\s*€", page_source):
-                span_start = max(0, m.start()-20)
-                span_end = min(len(page_source), m.end()+20)
-                context = page_source[span_start:span_end].lower()
-                if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', 'ανά']):
-                    continue
-                price_text = m.group(1)
-                break
-
-        if price_text:
-            return parse_price_to_float(price_text)
+        return _extract_mymarket_price(soup, page_source)
     except Exception as e:
         print(f"Error fetching MyMarket price: {e}")
     finally:
