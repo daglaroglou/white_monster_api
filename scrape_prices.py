@@ -1,19 +1,200 @@
 import json
-from datetime import datetime
+import os
+import re
+from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import chromedriver_autoinstaller
 
-# Automatically install the correct ChromeDriver version
-chromedriver_autoinstaller.install(path="")
+
+_CHROMEDRIVER_READY = None
+_CHROMEDRIVER_ERROR = None
+HISTORY_FILE = "price_history.json"
+HISTORY_DAYS = 31
+
+
+def safe_quit(driver):
+    """Close the webdriver safely when an exception already occurred."""
+    if driver:
+        try:
+            driver.quit()
+        except Exception:
+            pass
+
+
+def parse_price_to_float(price_text):
+    """Extract first numeric price token (supports 1.23 / 1,23 / 123 -> 1.23)."""
+    if not price_text:
+        return None
+
+    match = re.search(r"(\d+[.,]?\d*)", price_text)
+    if not match:
+        return None
+
+    raw_price = match.group(1)
+    value = float(raw_price.replace(",", "."))
+
+    # Handle sources that render cents without decimal separator (e.g. 114 => 1.14).
+    if ("." not in raw_price and "," not in raw_price) and 100 <= value < 10000:
+        value = value / 100
+    if value > 1000:
+        value = value / 100
+
+    return value
+
+
+def ensure_chromedriver():
+    """Install the matching ChromeDriver once per process."""
+    global _CHROMEDRIVER_READY, _CHROMEDRIVER_ERROR
+    if _CHROMEDRIVER_READY is not None:
+        return _CHROMEDRIVER_READY
+    try:
+        chromedriver_autoinstaller.install(path="")
+        _CHROMEDRIVER_READY = True
+    except Exception as exc:
+        _CHROMEDRIVER_ERROR = exc
+        _CHROMEDRIVER_READY = False
+    return _CHROMEDRIVER_READY
+
+
+def _append_history_point(history_list, timestamp, price, extra=None):
+    """Append/replace a timeseries point and keep bounded history."""
+    point = {"timestamp": timestamp, "price": round(price, 2)}
+    if extra:
+        point.update(extra)
+
+    if history_list and history_list[-1].get("timestamp") == timestamp:
+        history_list[-1] = point
+    else:
+        history_list.append(point)
+
+def _parse_iso_timestamp(timestamp):
+    if not timestamp:
+        return None
+    try:
+        return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def _trim_history_window(history_list, reference_timestamp, days=HISTORY_DAYS):
+    """Keep only points in the rolling N-day window."""
+    reference_dt = _parse_iso_timestamp(reference_timestamp)
+    if not reference_dt:
+        return
+    cutoff = reference_dt - timedelta(days=days)
+    filtered = []
+    for point in history_list:
+        point_dt = _parse_iso_timestamp(point.get("timestamp"))
+        if point_dt and point_dt >= cutoff:
+            filtered.append(point)
+    history_list[:] = filtered
+
+
+def _load_or_initialize_history(prices):
+    stores = prices.get("stores", {})
+    base_history = {
+        "last_updated": prices.get("last_updated"),
+        "product": prices.get("product", "Monster Energy Zero Ultra 500ml"),
+        "currency": prices.get("currency", "EUR"),
+        "total": {
+            "name": "Average Market Price",
+            "history": []
+        },
+        "stores": {}
+    }
+
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+            if isinstance(loaded, dict):
+                base_history.update({
+                    "last_updated": loaded.get("last_updated", base_history["last_updated"]),
+                    "product": loaded.get("product", base_history["product"]),
+                    "currency": loaded.get("currency", base_history["currency"]),
+                })
+                total_block = loaded.get("total", {})
+                if isinstance(total_block, dict):
+                    base_history["total"] = {
+                        "name": total_block.get("name", "Average Market Price"),
+                        "history": total_block.get("history", []),
+                    }
+                loaded_stores = loaded.get("stores", {})
+                if isinstance(loaded_stores, dict):
+                    for store_id, store_data in loaded_stores.items():
+                        if isinstance(store_data, dict):
+                            base_history["stores"][store_id] = {
+                                "name": store_data.get("name", store_id),
+                                "history": store_data.get("history", []),
+                            }
+        except Exception as e:
+            print(f"Warning: could not parse {HISTORY_FILE}, rebuilding it. ({e})")
+
+    for store_id, store_data in stores.items():
+        existing = base_history["stores"].get(store_id, {})
+        base_history["stores"][store_id] = {
+            "name": store_data.get("name", existing.get("name", store_id)),
+            "history": existing.get("history", []),
+        }
+
+    return base_history
+
+
+def update_price_history(prices):
+    """Persist per-market and aggregate historical prices for charts."""
+    history = _load_or_initialize_history(prices)
+    timestamp = prices.get("last_updated")
+    if not timestamp:
+        return
+
+    available_prices = []
+    for store_id, store_data in prices.get("stores", {}).items():
+        price = store_data.get("price")
+        if price is None:
+            continue
+
+        store_history = history["stores"].setdefault(
+            store_id,
+            {"name": store_data.get("name", store_id), "history": []}
+        )
+        store_history["name"] = store_data.get("name", store_history.get("name", store_id))
+        _append_history_point(store_history["history"], timestamp, price)
+        available_prices.append(float(price))
+
+    if available_prices:
+        market_average = sum(available_prices) / len(available_prices)
+        _append_history_point(
+            history["total"]["history"],
+            timestamp,
+            market_average,
+            extra={"available_stores": len(available_prices)}
+        )
+
+    history["last_updated"] = timestamp
+    history["product"] = prices.get("product", history.get("product"))
+    history["currency"] = prices.get("currency", history.get("currency"))
+
+    for store_data in history["stores"].values():
+        if isinstance(store_data, dict):
+            _trim_history_window(store_data.get("history", []), timestamp)
+    _trim_history_window(history["total"]["history"], timestamp)
+
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2, ensure_ascii=False)
 
 def get_driver():
     """Create a new Chrome driver instance with robust options"""
+    if not ensure_chromedriver():
+        raise RuntimeError(
+            f"Chrome/ChromeDriver unavailable: {_CHROMEDRIVER_ERROR}"
+        )
+
     chrome_options = Options()
     chrome_options.add_argument('--headless=new')
     chrome_options.add_argument('--disable-gpu')
@@ -52,8 +233,7 @@ def masoutis(url="https://www.masoutis.gr/categories/item/monster-energy-drink-u
     except Exception as e:
         print(f"Error fetching Masoutis price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsyktika/Energeiaka-Isotonika/Energeiako-Poto-Energy-Ultra-500ml/p/7289419"):
@@ -81,11 +261,7 @@ def ab(url="https://www.ab.gr/el/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsy
     except Exception as e:
         print(f"Error fetching AB price: {e}")
     finally:
-        if driver:
-            try:
-                driver.quit()
-            except:
-                pass
+        safe_quit(driver)
     return None
 
 def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsyktika-sodes-energeiaka-pota/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"):
@@ -104,16 +280,11 @@ def sklavenitis(url="https://www.sklavenitis.gr/anapsyktika-nera-chymoi/anapsykt
         
         if price_element:
             price_text = price_element.get_text(strip=True)
-            price = price_text.split('€')[0].strip().replace(',', '.')
-            return float(price)
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching Sklavenitis price: {e}")
     finally:
-        if driver:
-            try:
-                driver.quit()
-            except:
-                pass
+        safe_quit(driver)
     return None
 
 def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"):
@@ -131,13 +302,11 @@ def kritikos(url="https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/mo
         
         if price_element:
             price_text = price_element.get_text(strip=True)
-            price = price_text.replace('€', '').strip().replace(',', '.')
-            return float(price)
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching Kritikos price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
@@ -149,6 +318,56 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
+
+        def dismiss_mymarket_notification_popup():
+            """Close MyMarket push notification popup when it overlays the page."""
+            popup_close_locators = [
+                (By.XPATH, "//button[contains(normalize-space(.), 'Όχι') and contains(normalize-space(.), 'ευχαριστ')]"),
+                (By.XPATH, "//button[contains(normalize-space(.), 'Οχι') and contains(normalize-space(.), 'ευχαριστ')]"),
+                (By.XPATH, "//*[@role='button' and contains(normalize-space(.), 'ευχαριστ')]"),
+                (By.CSS_SELECTOR, "button[class*='deny'], button[class*='decline'], button[class*='reject']"),
+            ]
+
+            def try_close_in_current_context():
+                for by, selector in popup_close_locators:
+                    try:
+                        button = WebDriverWait(driver, 1.5).until(
+                            EC.element_to_be_clickable((by, selector))
+                        )
+                        driver.execute_script("arguments[0].click();", button)
+                        return True
+                    except TimeoutException:
+                        continue
+                    except Exception:
+                        continue
+                return False
+
+            # Try in main page first.
+            if try_close_in_current_context():
+                return
+
+            # Some popups are rendered inside iframes.
+            frames = driver.find_elements(By.TAG_NAME, "iframe")
+            for frame in frames:
+                try:
+                    driver.switch_to.frame(frame)
+                    if try_close_in_current_context():
+                        break
+                except Exception:
+                    continue
+                finally:
+                    driver.switch_to.default_content()
+
+        dismiss_mymarket_notification_popup()
+
+        # Give the product block a chance to render after dismissing overlays.
+        try:
+            WebDriverWait(driver, 8).until(
+                lambda d: d.find_elements(By.CSS_SELECTOR, "span.product-full--final-price, .product-full--final-price, span.product-full--price, [data-testid='product-price'], [data-testid='final-price']")
+            )
+        except TimeoutException:
+            pass
+
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
@@ -207,7 +426,6 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
 
         # Final fallback: regex on the whole page (avoid matching per-unit by checking surrounding text)
         if not price_text:
-            import re
             # find euro amounts not immediately followed by /L or similar
             for m in re.finditer(r"(\d+[.,]\d{1,2})\s*€", page_source):
                 span_start = max(0, m.start()-20)
@@ -219,28 +437,11 @@ def mymarket(url="https://www.mymarket.gr/monster-energy-zero-ultra-500gr"):
                 break
 
         if price_text:
-            # Extract numeric part and normalize decimal separator
-            import re
-            m = re.search(r"(\d+[.,]?\d*)", price_text)
-            if m:
-                raw_price = m.group(1)
-                price = raw_price.replace(',', '.')
-                try:
-                    val = float(price)
-                    # Fix cases like "210" that represent 2.10 (no decimal separator present)
-                    if ('.' not in raw_price and ',' not in raw_price) and 100 <= val < 10000:
-                        val = val / 100
-                    # sanity: if the price seems unreasonably large (e.g., > 1000), try dividing by 100
-                    if val > 1000:
-                        val = val / 100
-                    return val
-                except ValueError:
-                    pass
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching MyMarket price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def galaxias(url="https://galaxias.shop/product/5060337501125"):
@@ -258,13 +459,11 @@ def galaxias(url="https://galaxias.shop/product/5060337501125"):
         
         if price_element:
             price_text = price_element.get_text(strip=True)
-            price = price_text.replace('€', '').strip().replace(',', '.')
-            return float(price)
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching Galaxias price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def bazaar(url="https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?search=monster"):
@@ -282,13 +481,11 @@ def bazaar(url="https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?sea
         
         if price_element:
             price_text = price_element.get_text(strip=True)
-            price = price_text.replace('€', '').strip().replace(',', '.')
-            return float(price)
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching Bazaar price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"):
@@ -306,13 +503,11 @@ def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energ
         
         if price_element:
             price_text = price_element.get_text(strip=True)
-            price = price_text.replace('€', '').strip().replace(',', '.')
-            return float(price)
+            return parse_price_to_float(price_text)
     except Exception as e:
         print(f"Error fetching Market In price: {e}")
     finally:
-        if driver:
-            driver.quit()
+        safe_quit(driver)
     return None
 
 def main():
@@ -344,7 +539,7 @@ def main():
             "price": price,
             "available": price is not None
         }
-        if price:
+        if price is not None:
             print(f"{store_name}: €{price}")
         else:
             print(f"{store_name}: N/A")
@@ -352,8 +547,11 @@ def main():
     # Save to JSON file
     with open('prices.json', 'w', encoding='utf-8') as f:
         json.dump(prices, f, indent=2, ensure_ascii=False)
+
+    update_price_history(prices)
     
     print("\nPrices saved to prices.json")
+    print(f"Price history saved to {HISTORY_FILE}")
 
 if __name__ == "__main__":
     main()

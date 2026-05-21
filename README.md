@@ -28,6 +28,12 @@ Automated price tracking for Monster Energy Zero Ultra 500ml across multiple Gre
 https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json
 ```
 
+### History Endpoint
+
+```
+https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/price_history.json
+```
+
 ### Web Dashboard
 
 ```
@@ -93,11 +99,7 @@ curl https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices
 
 ## ⏰ Update Schedule
 
-The prices are automatically updated every 6 hours by GitHub Actions:
-- 00:00 UTC+2
-- 06:00 UTC+2
-- 12:00 UTC+2
-- 18:00 UTC+2
+The prices are automatically updated once per day at **08:00 Greece time** (`Europe/Athens`) by GitHub Actions.
 
 You can also manually trigger an update from the Actions tab.
 

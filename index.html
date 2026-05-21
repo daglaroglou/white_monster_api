@@ -316,6 +316,70 @@
             border: 1px solid #333;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
         }
+
+        .chart-panel {
+            background: #0f1622;
+            border: 1px solid #1d2b40;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .chart-title {
+            color: #c9d6e8;
+            margin-bottom: 14px;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        @media (max-width: 950px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: #0b121d;
+            border: 1px solid #22324a;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .chart-card h3 {
+            margin: 0 0 8px;
+            color: #e4efff;
+            font-size: 0.95em;
+            letter-spacing: 0.4px;
+        }
+
+        .chart-container {
+            height: 230px;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #22324a;
+            background: #0b121d;
+        }
+
+        .chart-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            color: #a7bedf;
+            font-size: 12px;
+        }
+
+        .chart-meta strong {
+            color: #ffffff;
+            margin-right: 5px;
+        }
         
         @media (max-width: 768px) {
             .json-display {
@@ -403,6 +467,14 @@
         </div>
         
         <div class="last-updated" id="last-updated"></div>
+
+        <h2>📈 Price History Charts</h2>
+        <div class="chart-panel">
+            <div class="chart-title" id="chart-title">1-month price trend per market (Athens timezone)</div>
+            <div class="charts-grid" id="charts-grid">
+                <div class="loading">Preparing market charts...</div>
+            </div>
+        </div>
         
         <h2>📄 Raw JSON Data</h2>
         <button onclick="toggleJson()">Toggle JSON View</button>
@@ -433,11 +505,13 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script>
         const repoOwner = 'daglaroglou';
         const repoName = 'white_monster_api';
         const apiUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/prices.json`;
         const localJsonPath = './prices.json';
+        const localHistoryPath = './price_history.json';
         
         document.getElementById('api-url').textContent = apiUrl;
         
@@ -451,6 +525,8 @@
         }
         
         let jsonData = null;
+        let historyData = null;
+        const chartRegistry = new Map();
         
         function toggleJson() {
             const jsonDisplay = document.getElementById('json-display');
@@ -464,19 +540,145 @@
             }
         }
         
+        function formatTimestamp(isoTs) {
+            const dt = new Date(isoTs);
+            return dt.toLocaleString('en-GB', {
+                timeZone: 'Europe/Athens',
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) + ' (Athens)';
+        }
+
+        function buildChartMeta(points) {
+            if (!points.length) {
+                return '<span class="unavailable">No 1-month points yet.</span>';
+            }
+            const values = points.map(p => p.value);
+            const first = values[0];
+            const last = values[values.length - 1];
+            const low = Math.min(...values);
+            const high = Math.max(...values);
+            const change = (((last - first) / first) * 100);
+            const changeColor = change >= 0 ? '#4ade80' : '#f87171';
+
+            return `
+                <span><strong>Current:</strong> €${last.toFixed(2)}</span>
+                <span><strong>Low:</strong> €${low.toFixed(2)}</span>
+                <span><strong>High:</strong> €${high.toFixed(2)}</span>
+                <span><strong>Change:</strong> <span style="color:${changeColor}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span></span>
+                <span><strong>Points:</strong> ${points.length}</span>
+            `;
+        }
+
+        function getOneMonthPoints(rawPoints) {
+            const normalized = (rawPoints || [])
+                .filter(p => p && typeof p.price === 'number' && p.timestamp)
+                .map(p => ({
+                    time: Math.floor(new Date(p.timestamp).getTime() / 1000),
+                    value: Number(p.price.toFixed(2)),
+                }))
+                .sort((a, b) => a.time - b.time);
+
+            if (!normalized.length) return [];
+            const latest = normalized[normalized.length - 1].time;
+            const monthAgo = latest - (30 * 24 * 60 * 60);
+            return normalized.filter(point => point.time >= monthAgo);
+        }
+
+        function buildChartCard(id, title, points) {
+            const safeId = `chart-${id}`;
+            return `
+                <div class="chart-card">
+                    <h3>${title}</h3>
+                    <div class="chart-container" id="${safeId}"></div>
+                    <div class="chart-meta">${buildChartMeta(points)}</div>
+                </div>
+            `;
+        }
+
+        function renderAllMarketCharts() {
+            const chartsGrid = document.getElementById('charts-grid');
+            const datasets = [
+                {
+                    id: 'total',
+                    name: historyData?.total?.name || 'Average Market Price',
+                    points: getOneMonthPoints(historyData?.total?.history || []),
+                },
+                ...Object.entries(historyData?.stores || {}).map(([storeId, storeData]) => ({
+                    id: storeId,
+                    name: storeData.name || storeId,
+                    points: getOneMonthPoints(storeData.history || []),
+                })),
+            ];
+
+            chartsGrid.innerHTML = datasets.map(item => buildChartCard(item.id, item.name, item.points)).join('');
+            chartRegistry.forEach(({ chart }) => chart.remove());
+            chartRegistry.clear();
+
+            datasets.forEach(item => {
+                const container = document.getElementById(`chart-${item.id}`);
+                if (!container) return;
+                const chart = LightweightCharts.createChart(container, {
+                    width: container.clientWidth,
+                    height: 230,
+                    layout: {
+                        background: { color: '#0b121d' },
+                        textColor: '#8fa9d1',
+                        fontFamily: 'Arial, sans-serif',
+                    },
+                    grid: {
+                        vertLines: { color: '#1a2a42' },
+                        horzLines: { color: '#1a2a42' },
+                    },
+                    rightPriceScale: {
+                        borderColor: '#2b3f60',
+                    },
+                    timeScale: {
+                        borderColor: '#2b3f60',
+                        timeVisible: true,
+                        secondsVisible: false,
+                    },
+                    crosshair: {
+                        mode: LightweightCharts.CrosshairMode.Normal,
+                    },
+                });
+
+                const series = chart.addAreaSeries({
+                    lineColor: '#4dabff',
+                    topColor: 'rgba(77, 171, 255, 0.35)',
+                    bottomColor: 'rgba(77, 171, 255, 0.02)',
+                    lineWidth: 2,
+                    priceLineColor: '#7fc1ff',
+                    priceLineVisible: true,
+                    lastValueVisible: true,
+                });
+
+                series.setData(item.points);
+                chart.timeScale().fitContent();
+                chartRegistry.set(item.id, { chart, container });
+            });
+        }
+
+        async function loadHistory() {
+            const cacheBuster = '?t=' + new Date().getTime();
+            const response = await fetch(localHistoryPath + cacheBuster);
+            historyData = await response.json();
+            renderAllMarketCharts();
+        }
+
         async function loadPrices() {
             try {
                 const cacheBuster = '?t=' + new Date().getTime();
                 const response = await fetch(localJsonPath + cacheBuster);
                 const data = await response.json();
                 jsonData = data;
-                
-                console.log('Loaded from local file');
-                console.log('Raw timestamp from JSON:', data.last_updated);
-                
+
                 const pricesDiv = document.getElementById('prices');
                 const stores = data.stores;
-                
+
                 let html = '';
                 for (const [storeId, storeData] of Object.entries(stores)) {
                     const priceClass = storeData.available ? 'price' : 'unavailable';
@@ -489,24 +691,24 @@
                     `;
                 }
                 pricesDiv.innerHTML = html;
-                const timestampStr = data.last_updated;
-                const [datePart, timePart] = timestampStr.split('T');
-                const [year, month, day] = datePart.split('-');
-                const [hour, minute] = timePart.split(':');
-                
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                               'July', 'August', 'September', 'October', 'November', 'December'];
-                
-                const formattedDate = `${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}, ${hour}:${minute} (UTC+2/GMT+3)`;
-                document.getElementById('last-updated').textContent = 
-                    `Last updated: ${formattedDate}`;
-                    
+                document.getElementById('last-updated').textContent =
+                    `Last updated: ${formatTimestamp(data.last_updated)}`;
+
+                await loadHistory();
             } catch (error) {
-                document.getElementById('prices').innerHTML = 
+                document.getElementById('prices').innerHTML =
                     '<div class="unavailable">Error loading prices. Please try again later.</div>';
-                console.error('Error fetching prices:', error);
+                document.getElementById('charts-grid').innerHTML =
+                    '<div class="unavailable">Could not load history file.</div>';
+                console.error('Error fetching prices/history:', error);
             }
         }
+
+        window.addEventListener('resize', () => {
+            chartRegistry.forEach(({ chart, container }) => {
+                chart.applyOptions({ width: container.clientWidth });
+            });
+        });
         
         loadPrices();
         
