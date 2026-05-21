@@ -561,7 +561,7 @@
             const last = values[values.length - 1];
             const low = Math.min(...values);
             const high = Math.max(...values);
-            const change = (((last - first) / first) * 100);
+            const change = first === 0 ? 0 : (((last - first) / first) * 100);
             const changeColor = change >= 0 ? '#4ade80' : '#f87171';
 
             return `
@@ -597,6 +597,17 @@
                     <div class="chart-meta">${buildChartMeta(points)}</div>
                 </div>
             `;
+        }
+
+        function createAreaSeries(chart, options) {
+            // Lightweight Charts v4 uses addAreaSeries, v5 uses addSeries(AreaSeries, ...).
+            if (typeof chart.addAreaSeries === 'function') {
+                return chart.addAreaSeries(options);
+            }
+            if (typeof chart.addSeries === 'function' && LightweightCharts.AreaSeries) {
+                return chart.addSeries(LightweightCharts.AreaSeries, options);
+            }
+            throw new Error('Area series API is unavailable in current Lightweight Charts build.');
         }
 
         function renderAllMarketCharts() {
@@ -646,7 +657,7 @@
                     },
                 });
 
-                const series = chart.addAreaSeries({
+                const series = createAreaSeries(chart, {
                     lineColor: '#4dabff',
                     topColor: 'rgba(77, 171, 255, 0.35)',
                     bottomColor: 'rgba(77, 171, 255, 0.02)',
@@ -663,10 +674,16 @@
         }
 
         async function loadHistory() {
-            const cacheBuster = '?t=' + new Date().getTime();
-            const response = await fetch(localHistoryPath + cacheBuster);
-            historyData = await response.json();
-            renderAllMarketCharts();
+            try {
+                const cacheBuster = '?t=' + new Date().getTime();
+                const response = await fetch(localHistoryPath + cacheBuster);
+                historyData = await response.json();
+                renderAllMarketCharts();
+            } catch (error) {
+                document.getElementById('charts-grid').innerHTML =
+                    '<div class="unavailable">Could not load history file.</div>';
+                console.error('Error rendering history charts:', error);
+            }
         }
 
         async function loadPrices() {
@@ -681,8 +698,10 @@
 
                 let html = '';
                 for (const [storeId, storeData] of Object.entries(stores)) {
-                    const priceClass = storeData.available ? 'price' : 'unavailable';
-                    const priceText = storeData.available ? `€${storeData.price.toFixed(2)}` : 'N/A';
+                    const hasNumericPrice = typeof storeData.price === 'number' && Number.isFinite(storeData.price);
+                    const isAvailable = Boolean(storeData.available) && hasNumericPrice;
+                    const priceClass = isAvailable ? 'price' : 'unavailable';
+                    const priceText = isAvailable ? `€${storeData.price.toFixed(2)}` : 'N/A';
                     html += `
                         <div class="store-item">
                             <span>${storeData.name}</span>
@@ -698,8 +717,6 @@
             } catch (error) {
                 document.getElementById('prices').innerHTML =
                     '<div class="unavailable">Error loading prices. Please try again later.</div>';
-                document.getElementById('charts-grid').innerHTML =
-                    '<div class="unavailable">Could not load history file.</div>';
                 console.error('Error fetching prices/history:', error);
             }
         }

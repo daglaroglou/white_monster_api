@@ -1,6 +1,8 @@
 import json
 import os
 import re
+import shutil
+from pathlib import Path
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -60,6 +62,37 @@ def ensure_chromedriver():
         _CHROMEDRIVER_ERROR = exc
         _CHROMEDRIVER_READY = False
     return _CHROMEDRIVER_READY
+
+
+def locate_chrome_binary():
+    """Return a Chrome/Chromium executable path if available."""
+    # Highest priority: explicit override from environment.
+    env_path = os.environ.get("CHROME_BIN")
+    if env_path and Path(env_path).exists():
+        return env_path
+
+    # Common executable names on Linux/Windows runners and local machines.
+    for candidate in [
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium",
+        "chromium-browser",
+        "chrome",
+        "msedge",
+        "microsoft-edge",
+    ]:
+        resolved = shutil.which(candidate)
+        if resolved:
+            return resolved
+
+    # Playwright browser cache fallback used in CI/local environments.
+    playwright_matches = sorted(
+        Path.home().glob(".cache/ms-playwright/chromium-*/chrome-linux64/chrome")
+    )
+    if playwright_matches:
+        return str(playwright_matches[-1])
+
+    return None
 
 
 def _append_history_point(history_list, timestamp, price, extra=None):
@@ -190,11 +223,6 @@ def update_price_history(prices):
 
 def get_driver():
     """Create a new Chrome driver instance with robust options"""
-    if not ensure_chromedriver():
-        raise RuntimeError(
-            f"Chrome/ChromeDriver unavailable: {_CHROMEDRIVER_ERROR}"
-        )
-
     chrome_options = Options()
     chrome_options.add_argument('--headless=new')
     chrome_options.add_argument('--disable-gpu')
@@ -209,7 +237,15 @@ def get_driver():
     chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
     chrome_options.add_experimental_option('useAutomationExtension', False)
-    
+
+    chrome_binary = locate_chrome_binary()
+    if chrome_binary:
+        chrome_options.binary_location = chrome_binary
+
+    # Keep chromedriver-autoinstaller as best-effort only. Selenium Manager
+    # can still provision a matching driver if this fails.
+    ensure_chromedriver()
+
     driver = webdriver.Chrome(options=chrome_options)
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
