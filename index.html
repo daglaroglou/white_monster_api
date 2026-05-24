@@ -318,18 +318,21 @@
         }
 
         .chart-panel {
-            background: #0f1622;
-            border: 1px solid #1d2b40;
+            background: #111;
+            border: 1px solid #222;
             border-radius: 12px;
             padding: 20px;
             margin-top: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
         }
 
         .chart-title {
-            color: #c9d6e8;
+            color: #00D9FF;
             margin-bottom: 14px;
-            font-size: 0.95em;
-            letter-spacing: 0.5px;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
 
         .charts-grid {
@@ -345,17 +348,22 @@
         }
 
         .chart-card {
-            background: #0b121d;
-            border: 1px solid #22324a;
+            background: #1a1a1a;
+            border: 1px solid #222;
             border-radius: 10px;
             padding: 14px;
         }
 
+        .chart-card-wide {
+            grid-column: span 2;
+        }
+
         .chart-card h3 {
             margin: 0 0 8px;
-            color: #e4efff;
+            color: #fff;
             font-size: 0.95em;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
         }
 
         .chart-container {
@@ -363,8 +371,26 @@
             width: 100%;
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #22324a;
-            background: #0b121d;
+            border: 1px solid #2a2a2a;
+            background: #0d0d0d;
+            position: relative;
+        }
+
+        .chart-container svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .chart-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #777;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
         .chart-meta {
@@ -372,7 +398,7 @@
             gap: 12px;
             flex-wrap: wrap;
             margin-top: 8px;
-            color: #a7bedf;
+            color: #aaa;
             font-size: 12px;
         }
 
@@ -470,7 +496,7 @@
 
         <h2>📈 Price History Charts</h2>
         <div class="chart-panel">
-            <div class="chart-title" id="chart-title">1-month price trend per market (Athens timezone)</div>
+            <div class="chart-title" id="chart-title">1-month price trend per market</div>
             <div class="charts-grid" id="charts-grid">
                 <div class="loading">Preparing market charts...</div>
             </div>
@@ -505,7 +531,6 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script>
         const repoOwner = 'daglaroglou';
         const repoName = 'white_monster_api';
@@ -562,14 +587,14 @@
             const low = Math.min(...values);
             const high = Math.max(...values);
             const change = first === 0 ? 0 : (((last - first) / first) * 100);
-            const changeColor = change >= 0 ? '#4ade80' : '#f87171';
+            // For buyers, price drops are positive and price increases are negative.
+            const changeColor = change <= 0 ? '#4ade80' : '#f87171';
 
             return `
                 <span><strong>Current:</strong> €${last.toFixed(2)}</span>
                 <span><strong>Low:</strong> €${low.toFixed(2)}</span>
                 <span><strong>High:</strong> €${high.toFixed(2)}</span>
                 <span><strong>Change:</strong> <span style="color:${changeColor}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span></span>
-                <span><strong>Points:</strong> ${points.length}</span>
             `;
         }
 
@@ -590,8 +615,9 @@
 
         function buildChartCard(id, title, points) {
             const safeId = `chart-${id}`;
+            const cardClass = id === 'total' ? 'chart-card chart-card-wide' : 'chart-card';
             return `
-                <div class="chart-card">
+                <div class="${cardClass}">
                     <h3>${title}</h3>
                     <div class="chart-container" id="${safeId}"></div>
                     <div class="chart-meta">${buildChartMeta(points)}</div>
@@ -599,15 +625,142 @@
             `;
         }
 
-        function createAreaSeries(chart, options) {
-            // Lightweight Charts v4 uses addAreaSeries, v5 uses addSeries(AreaSeries, ...).
-            if (typeof chart.addAreaSeries === 'function') {
-                return chart.addAreaSeries(options);
+        function formatChartDate(unixTime, withYear = false) {
+            return new Date(unixTime * 1000).toLocaleDateString('en-GB', {
+                timeZone: 'Europe/Athens',
+                day: '2-digit',
+                month: 'short',
+                ...(withYear ? { year: '2-digit' } : {})
+            });
+        }
+
+        function buildSmoothPath(coords) {
+            if (!coords.length) return '';
+            if (coords.length === 1) {
+                const point = coords[0];
+                return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
             }
-            if (typeof chart.addSeries === 'function' && LightweightCharts.AreaSeries) {
-                return chart.addSeries(LightweightCharts.AreaSeries, options);
+            if (coords.length === 2) {
+                const first = coords[0];
+                const second = coords[1];
+                return `M ${first.x.toFixed(2)} ${first.y.toFixed(2)} L ${second.x.toFixed(2)} ${second.y.toFixed(2)}`;
             }
-            throw new Error('Area series API is unavailable in current Lightweight Charts build.');
+
+            // Midpoint quadratic smoothing produces clearly softer transitions
+            // than segmented lines while still following point direction.
+            let path = `M ${coords[0].x.toFixed(2)} ${coords[0].y.toFixed(2)}`;
+            for (let i = 1; i < coords.length - 1; i++) {
+                const control = coords[i];
+                const next = coords[i + 1];
+                const midX = ((control.x + next.x) / 2).toFixed(2);
+                const midY = ((control.y + next.y) / 2).toFixed(2);
+                path += ` Q ${control.x.toFixed(2)} ${control.y.toFixed(2)} ${midX} ${midY}`;
+            }
+            const penultimate = coords[coords.length - 2];
+            const last = coords[coords.length - 1];
+            path += ` Q ${penultimate.x.toFixed(2)} ${penultimate.y.toFixed(2)} ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+            return path;
+        }
+
+        function drawCustomChart(container, points, chartId) {
+            container.innerHTML = '';
+            if (!points.length) {
+                container.innerHTML = '<div class="chart-empty">No 30-day data yet</div>';
+                return;
+            }
+
+            const width = Math.max(320, container.clientWidth || 320);
+            const height = 230;
+            const margin = { top: 16, right: 12, bottom: 30, left: 48 };
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            const minX = points[0].time;
+            const maxX = points[points.length - 1].time;
+            const values = points.map(point => point.value);
+            const minY = Math.min(...values);
+            const maxY = Math.max(...values);
+            const ySpan = Math.max(0.05, maxY - minY);
+            const paddedMinY = Math.max(0, minY - ySpan * 0.15);
+            const paddedMaxY = maxY + ySpan * 0.15;
+
+            const xToPx = x => {
+                const ratio = maxX === minX ? 0.5 : (x - minX) / (maxX - minX);
+                return margin.left + ratio * innerWidth;
+            };
+            const yToPx = y => {
+                const ratio = (y - paddedMinY) / (paddedMaxY - paddedMinY);
+                return margin.top + innerHeight - ratio * innerHeight;
+            };
+
+            let pathLine = '';
+            let pathArea = '';
+            const chartCoords = points.map(point => ({
+                x: xToPx(point.time),
+                y: yToPx(point.value),
+            }));
+            pathLine = buildSmoothPath(chartCoords);
+
+            if (pathLine) {
+                const firstX = xToPx(points[0].time);
+                const lastX = xToPx(points[points.length - 1].time);
+                const baseY = margin.top + innerHeight;
+                pathArea = `${pathLine} L ${lastX.toFixed(2)} ${baseY.toFixed(2)} L ${firstX.toFixed(2)} ${baseY.toFixed(2)} Z`;
+            }
+
+            const yTickCount = 4;
+            const yTicks = Array.from({ length: yTickCount + 1 }, (_, index) => paddedMinY + ((paddedMaxY - paddedMinY) * index) / yTickCount);
+            const xTicks = [minX, minX + (maxX - minX) / 2, maxX];
+
+            const gridLines = yTicks.map(value => {
+                const y = yToPx(value).toFixed(2);
+                return `<line x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}" stroke="#1f1f1f" stroke-width="1" />`;
+            }).join('');
+
+            const yLabels = yTicks.map(value => {
+                const y = yToPx(value).toFixed(2);
+                return `<text x="${margin.left - 8}" y="${y}" fill="#888" font-size="11" text-anchor="end" dominant-baseline="middle">€${value.toFixed(2)}</text>`;
+            }).join('');
+
+            const xLabels = xTicks.map((value, index) => {
+                const x = xToPx(value).toFixed(2);
+                const anchor = index === 0 ? 'start' : (index === xTicks.length - 1 ? 'end' : 'middle');
+                return `<text x="${x}" y="${height - 8}" fill="#888" font-size="11" text-anchor="${anchor}">${formatChartDate(value)}</text>`;
+            }).join('');
+
+            const pointDots = chartCoords.map((coord, index) => {
+                const isLast = index === chartCoords.length - 1;
+                return `<circle cx="${coord.x.toFixed(2)}" cy="${coord.y.toFixed(2)}" r="${isLast ? 3.4 : 2.2}" fill="${isLast ? '#00D9FF' : '#ffffff'}" />`;
+            }).join('');
+
+            const latest = points[points.length - 1];
+            const rawLatestX = xToPx(latest.time);
+            const rawLatestY = yToPx(latest.value);
+            const latestLabelX = Math.min(
+                width - margin.right - 24,
+                Math.max(margin.left + 24, rawLatestX)
+            );
+            const latestLabelY = Math.max(margin.top + 12, rawLatestY - 10);
+
+            container.innerHTML = `
+                <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Price chart">
+                    <defs>
+                        <linearGradient id="fill-${chartId}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#00D9FF" stop-opacity="0.28" />
+                            <stop offset="100%" stop-color="#00D9FF" stop-opacity="0.01" />
+                        </linearGradient>
+                    </defs>
+                    ${gridLines}
+                    <line x1="${margin.left}" y1="${margin.top + innerHeight}" x2="${width - margin.right}" y2="${margin.top + innerHeight}" stroke="#2a2a2a" stroke-width="1.2" />
+                    <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + innerHeight}" stroke="#2a2a2a" stroke-width="1.2" />
+                    <path d="${pathArea}" fill="url(#fill-${chartId})" />
+                    <path d="${pathLine}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                    ${pointDots}
+                    ${yLabels}
+                    ${xLabels}
+                    <text x="${latestLabelX.toFixed(2)}" y="${latestLabelY.toFixed(2)}" fill="#00D9FF" font-size="11" text-anchor="middle">€${latest.value.toFixed(2)}</text>
+                </svg>
+            `;
         }
 
         function renderAllMarketCharts() {
@@ -626,50 +779,13 @@
             ];
 
             chartsGrid.innerHTML = datasets.map(item => buildChartCard(item.id, item.name, item.points)).join('');
-            chartRegistry.forEach(({ chart }) => chart.remove());
             chartRegistry.clear();
 
             datasets.forEach(item => {
                 const container = document.getElementById(`chart-${item.id}`);
                 if (!container) return;
-                const chart = LightweightCharts.createChart(container, {
-                    width: container.clientWidth,
-                    height: 230,
-                    layout: {
-                        background: { color: '#0b121d' },
-                        textColor: '#8fa9d1',
-                        fontFamily: 'Arial, sans-serif',
-                    },
-                    grid: {
-                        vertLines: { color: '#1a2a42' },
-                        horzLines: { color: '#1a2a42' },
-                    },
-                    rightPriceScale: {
-                        borderColor: '#2b3f60',
-                    },
-                    timeScale: {
-                        borderColor: '#2b3f60',
-                        timeVisible: true,
-                        secondsVisible: false,
-                    },
-                    crosshair: {
-                        mode: LightweightCharts.CrosshairMode.Normal,
-                    },
-                });
-
-                const series = createAreaSeries(chart, {
-                    lineColor: '#4dabff',
-                    topColor: 'rgba(77, 171, 255, 0.35)',
-                    bottomColor: 'rgba(77, 171, 255, 0.02)',
-                    lineWidth: 2,
-                    priceLineColor: '#7fc1ff',
-                    priceLineVisible: true,
-                    lastValueVisible: true,
-                });
-
-                series.setData(item.points);
-                chart.timeScale().fitContent();
-                chartRegistry.set(item.id, { chart, container });
+                drawCustomChart(container, item.points, item.id);
+                chartRegistry.set(item.id, { container, points: item.points });
             });
         }
 
@@ -722,8 +838,8 @@
         }
 
         window.addEventListener('resize', () => {
-            chartRegistry.forEach(({ chart, container }) => {
-                chart.applyOptions({ width: container.clientWidth });
+            chartRegistry.forEach(({ container, points }, chartId) => {
+                drawCustomChart(container, points, chartId);
             });
         });
         
