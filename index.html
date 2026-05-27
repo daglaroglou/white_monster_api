@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>White Monster Price Tracker</title>
     
-    <meta name="description" content="Track Monster Energy Zero Ultra 500ml prices across multiple Greek supermarkets.">
-    <meta name="keywords" content="Monster Energy, price tracker, API, Greece, supermarkets, Ultra Zero">
+    <meta name="description" content="Track Monster Energy Zero Ultra 500ml prices across 9 Greek supermarkets including Masoutis, AB, Sklavenitis, Kritikos, MyMarket, Galaxias, Bazaar, Market In, and 24hr Stores.">
+    <meta name="keywords" content="Monster Energy, price tracker, API, Greece, supermarkets, Ultra Zero, 24hr Stores, Masoutis, Sklavenitis">
     <meta name="author" content="daglaroglou">
 
     <meta name="theme-color" content="#000000">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="White Monster Price Tracker API">
-    <meta property="og:description" content="Track White Monster Energy 500ml prices across multiple Greek supermarkets.">
+    <meta property="og:description" content="Track White Monster Energy 500ml prices across 9 Greek supermarkets including 24hr Stores.">
     <meta property="og:url" content="https://daglaroglou.github.io/white_monster_api/">
     <meta property="og:image" content="https://daglaroglou.github.io/white_monster_api/img/logo.png">
     <meta property="og:site_name" content="White Monster Price Tracker">
@@ -477,7 +477,7 @@
         </div>
         <h1>Price Tracker</h1>
         <div class="subtitle">ULTRA ZERO</div>
-        <p style="text-align: center; color: #888; margin-bottom: 20px;">Track Monster Energy Zero Ultra 500ml prices across multiple Greek supermarkets.</p>
+        <p style="text-align: center; color: #888; margin-bottom: 20px;">Track Monster Energy Zero Ultra 500ml prices across 9 Greek supermarkets: Masoutis, AB, Sklavenitis, Kritikos, MyMarket, Galaxias, Bazaar, Market In, and 24hr Stores.</p>
         
         <h2>📡 API Endpoint</h2>
         <div class="endpoint">
@@ -537,6 +537,27 @@
         const apiUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/prices.json`;
         const localJsonPath = './prices.json';
         const localHistoryPath = './price_history.json';
+        const STORE_ORDER = [
+            'masoutis',
+            'ab',
+            'sklavenitis',
+            'kritikos',
+            'mymarket',
+            'galaxias',
+            'bazaar',
+            'marketin',
+            '24hr',
+        ];
+
+        function sortStoreEntries(stores) {
+            return Object.entries(stores || {}).sort(([a], [b]) => {
+                const indexA = STORE_ORDER.indexOf(a);
+                const indexB = STORE_ORDER.indexOf(b);
+                const rankA = indexA === -1 ? STORE_ORDER.length : indexA;
+                const rankB = indexB === -1 ? STORE_ORDER.length : indexB;
+                return rankA - rankB;
+            });
+        }
         
         document.getElementById('api-url').textContent = apiUrl;
         
@@ -598,6 +619,56 @@
             `;
         }
 
+        function buildAverageHistoryPoints(stores) {
+            const storeSeries = [];
+            const timestampSet = new Set();
+
+            for (const storeData of Object.values(stores || {})) {
+                const series = (storeData?.history || [])
+                    .filter(point => point?.timestamp && typeof point.price === 'number')
+                    .map(point => ({
+                        time: new Date(point.timestamp).getTime(),
+                        timestamp: point.timestamp,
+                        price: point.price,
+                    }))
+                    .sort((a, b) => a.time - b.time);
+
+                if (!series.length) {
+                    continue;
+                }
+
+                series.forEach(point => timestampSet.add(point.timestamp));
+                storeSeries.push(series);
+            }
+
+            return Array.from(timestampSet)
+                .sort((a, b) => new Date(a) - new Date(b))
+                .map(timestamp => {
+                    const pointTime = new Date(timestamp).getTime();
+                    const prices = [];
+
+                    for (const series of storeSeries) {
+                        let lastPrice = null;
+                        for (const point of series) {
+                            if (point.time <= pointTime) {
+                                lastPrice = point.price;
+                            } else {
+                                break;
+                            }
+                        }
+                        if (lastPrice !== null) {
+                            prices.push(lastPrice);
+                        }
+                    }
+
+                    return {
+                        timestamp,
+                        price: Number((prices.reduce((sum, value) => sum + value, 0) / prices.length).toFixed(2)),
+                        available_stores: prices.length,
+                    };
+                });
+        }
+
         function getOneMonthPoints(rawPoints) {
             const normalized = (rawPoints || [])
                 .filter(p => p && typeof p.price === 'number' && p.timestamp)
@@ -634,31 +705,12 @@
             });
         }
 
-        function buildSmoothPath(coords) {
+        function buildLinePath(coords) {
             if (!coords.length) return '';
-            if (coords.length === 1) {
-                const point = coords[0];
-                return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-            }
-            if (coords.length === 2) {
-                const first = coords[0];
-                const second = coords[1];
-                return `M ${first.x.toFixed(2)} ${first.y.toFixed(2)} L ${second.x.toFixed(2)} ${second.y.toFixed(2)}`;
-            }
-
-            // Midpoint quadratic smoothing produces clearly softer transitions
-            // than segmented lines while still following point direction.
             let path = `M ${coords[0].x.toFixed(2)} ${coords[0].y.toFixed(2)}`;
-            for (let i = 1; i < coords.length - 1; i++) {
-                const control = coords[i];
-                const next = coords[i + 1];
-                const midX = ((control.x + next.x) / 2).toFixed(2);
-                const midY = ((control.y + next.y) / 2).toFixed(2);
-                path += ` Q ${control.x.toFixed(2)} ${control.y.toFixed(2)} ${midX} ${midY}`;
+            for (let i = 1; i < coords.length; i++) {
+                path += ` L ${coords[i].x.toFixed(2)} ${coords[i].y.toFixed(2)}`;
             }
-            const penultimate = coords[coords.length - 2];
-            const last = coords[coords.length - 1];
-            path += ` Q ${penultimate.x.toFixed(2)} ${penultimate.y.toFixed(2)} ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
             return path;
         }
 
@@ -685,7 +737,8 @@
             const paddedMaxY = maxY + ySpan * 0.15;
 
             const xToPx = x => {
-                const ratio = maxX === minX ? 0.5 : (x - minX) / (maxX - minX);
+                const xSpan = Math.max(1, maxX - minX);
+                const ratio = (x - minX) / xSpan;
                 return margin.left + ratio * innerWidth;
             };
             const yToPx = y => {
@@ -695,16 +748,16 @@
 
             let pathLine = '';
             let pathArea = '';
+            const baseY = margin.top + innerHeight;
             const chartCoords = points.map(point => ({
                 x: xToPx(point.time),
                 y: yToPx(point.value),
             }));
-            pathLine = buildSmoothPath(chartCoords);
 
+            pathLine = buildLinePath(chartCoords);
             if (pathLine) {
                 const firstX = xToPx(points[0].time);
                 const lastX = xToPx(points[points.length - 1].time);
-                const baseY = margin.top + innerHeight;
                 pathArea = `${pathLine} L ${lastX.toFixed(2)} ${baseY.toFixed(2)} L ${firstX.toFixed(2)} ${baseY.toFixed(2)} Z`;
             }
 
@@ -769,9 +822,9 @@
                 {
                     id: 'total',
                     name: historyData?.total?.name || 'Average Market Price',
-                    points: getOneMonthPoints(historyData?.total?.history || []),
+                    points: getOneMonthPoints(buildAverageHistoryPoints(historyData?.stores)),
                 },
-                ...Object.entries(historyData?.stores || {}).map(([storeId, storeData]) => ({
+                ...sortStoreEntries(historyData?.stores).map(([storeId, storeData]) => ({
                     id: storeId,
                     name: storeData.name || storeId,
                     points: getOneMonthPoints(storeData.history || []),
@@ -810,10 +863,8 @@
                 jsonData = data;
 
                 const pricesDiv = document.getElementById('prices');
-                const stores = data.stores;
-
                 let html = '';
-                for (const [storeId, storeData] of Object.entries(stores)) {
+                for (const [storeId, storeData] of sortStoreEntries(data.stores)) {
                     const hasNumericPrice = typeof storeData.price === 'number' && Number.isFinite(storeData.price);
                     const isAvailable = Boolean(storeData.available) && hasNumericPrice;
                     const priceClass = isAvailable ? 'price' : 'unavailable';

@@ -7,7 +7,7 @@ Automated price tracking for Monster Energy Zero Ultra 500ml across multiple Gre
 - **Automated Updates**: Prices are updated every 6 hours via GitHub Actions
 - **Public API**: Access current prices via a simple JSON API
 - **Web Interface**: Beautiful dashboard to view prices
-- **Multi-Store Coverage**: Tracks prices from 8 different supermarkets
+- **Multi-Store Coverage**: Tracks prices from 9 different supermarkets
 
 ## 🏪 Tracked Stores
 
@@ -19,6 +19,7 @@ Automated price tracking for Monster Energy Zero Ultra 500ml across multiple Gre
 - Galaxias
 - Bazaar
 - Market In
+- 24hr Stores
 
 ## 📡 API Usage
 

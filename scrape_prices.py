@@ -2,6 +2,7 @@ import json
 import os
 import re
 import shutil
+import requests
 from pathlib import Path
 from datetime import datetime, timedelta
 from selenium import webdriver
@@ -115,6 +116,97 @@ def _parse_iso_timestamp(timestamp):
         return None
 
 
+def _rebuild_total_history(history):
+    """Derive average market price using last-known price per store at each timestamp."""
+    store_series = []
+    all_timestamps = set()
+
+    for store_data in history.get("stores", {}).values():
+        if not isinstance(store_data, dict):
+            continue
+        series = []
+        for point in store_data.get("history", []):
+            if not isinstance(point, dict):
+                continue
+            timestamp = point.get("timestamp")
+            price = point.get("price")
+            point_dt = _parse_iso_timestamp(timestamp)
+            if not timestamp or price is None or not point_dt:
+                continue
+            series.append((point_dt, timestamp, float(price)))
+            all_timestamps.add(timestamp)
+        if series:
+            series.sort(key=lambda item: item[0])
+            store_series.append(series)
+
+    total_history = []
+    for timestamp in sorted(
+        all_timestamps,
+        key=lambda ts: _parse_iso_timestamp(ts) or datetime.min,
+    ):
+        point_dt = _parse_iso_timestamp(timestamp)
+        if not point_dt:
+            continue
+
+        prices = []
+        for series in store_series:
+            last_price = None
+            for entry_dt, _, entry_price in series:
+                if entry_dt <= point_dt:
+                    last_price = entry_price
+                else:
+                    break
+            if last_price is not None:
+                prices.append(last_price)
+
+        if prices:
+            total_history.append({
+                "timestamp": timestamp,
+                "price": round(sum(prices) / len(prices), 2),
+                "available_stores": len(prices),
+            })
+
+    history.setdefault("total", {"name": "Average Market Price", "history": []})
+    history["total"]["history"] = total_history
+
+
+def _collect_scrape_timestamps(history):
+    timestamps = set()
+    for store_data in history.get("stores", {}).values():
+        if not isinstance(store_data, dict):
+            continue
+        for point in store_data.get("history", []):
+            timestamp = point.get("timestamp")
+            if timestamp:
+                timestamps.add(timestamp)
+    return sorted(timestamps, key=lambda ts: _parse_iso_timestamp(ts) or datetime.min)
+
+
+def _backfill_store_history_gaps(history, store_id, fallback_price):
+    """Fill missing scrape timestamps so new stores chart like existing ones."""
+    scrape_timestamps = _collect_scrape_timestamps(history)
+    if not scrape_timestamps or fallback_price is None:
+        return
+
+    store_history = history["stores"].get(store_id)
+    if not isinstance(store_history, dict):
+        return
+
+    entries = store_history.setdefault("history", [])
+    existing = {point.get("timestamp") for point in entries if point.get("timestamp")}
+    fill_price = round(float(fallback_price), 2)
+
+    for timestamp in scrape_timestamps:
+        if timestamp in existing:
+            continue
+        entries.append({"timestamp": timestamp, "price": fill_price})
+        existing.add(timestamp)
+
+    entries.sort(
+        key=lambda point: _parse_iso_timestamp(point.get("timestamp")) or datetime.min
+    )
+
+
 def _trim_history_window(history_list, reference_timestamp, days=HISTORY_DAYS):
     """Keep only points in the rolling N-day window."""
     reference_dt = _parse_iso_timestamp(reference_timestamp)
@@ -186,10 +278,9 @@ def update_price_history(prices):
     if not timestamp:
         return
 
-    available_prices = []
     for store_id, store_data in prices.get("stores", {}).items():
         price = store_data.get("price")
-        if price is None:
+        if price is None or not store_data.get("available", True):
             continue
 
         store_history = history["stores"].setdefault(
@@ -198,16 +289,12 @@ def update_price_history(prices):
         )
         store_history["name"] = store_data.get("name", store_history.get("name", store_id))
         _append_history_point(store_history["history"], timestamp, price)
-        available_prices.append(float(price))
 
-    if available_prices:
-        market_average = sum(available_prices) / len(available_prices)
-        _append_history_point(
-            history["total"]["history"],
-            timestamp,
-            market_average,
-            extra={"available_stores": len(available_prices)}
-        )
+    for store_id, store_data in prices.get("stores", {}).items():
+        price = store_data.get("price")
+        if price is None or not store_data.get("available", True):
+            continue
+        _backfill_store_history_gaps(history, store_id, price)
 
     history["last_updated"] = timestamp
     history["product"] = prices.get("product", history.get("product"))
@@ -216,6 +303,7 @@ def update_price_history(prices):
     for store_data in history["stores"].values():
         if isinstance(store_data, dict):
             _trim_history_window(store_data.get("history", []), timestamp)
+    _rebuild_total_history(history)
     _trim_history_window(history["total"]["history"], timestamp)
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
@@ -559,6 +647,41 @@ def bazaar(url="https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?sea
         safe_quit(driver)
     return None
 
+def hr24(url="https://www.24hr.gr/el/%CF%80%CF%81%CE%BF%CF%8A%CF%8C%CE%BD%CF%84%CE%B1/energy/energy/monster-energy-%CE%B5%CE%BD%CE%B5%CF%81%CE%B3%CE%B5%CE%B9%CE%B1%CE%BA%CF%8C-%CF%80%CE%BF%CF%84%CF%8C-ultra-white-zero-sugar-500ml"):
+    """Fetch 24hr.gr product price (server-rendered HTML, no browser needed)."""
+    try:
+        response = requests.get(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                )
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        price_element = soup.select_one(
+            "#das-product-details-price, .das-product-details-price-value"
+        )
+        if price_element:
+            parsed = parse_price_to_float(price_element.get_text(strip=True))
+            if parsed is not None:
+                return parsed
+
+        final_price_input = soup.select_one(
+            'input[name="final_price"][das-cart-key="final_price"]'
+        )
+        if final_price_input and final_price_input.get("value"):
+            return parse_price_to_float(final_price_input["value"])
+    except Exception as e:
+        print(f"Error fetching 24hr.gr price: {e}")
+    return None
+
+
 def marketin(url="https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"):
     driver = None
     try:
@@ -599,7 +722,8 @@ def main():
         ("mymarket", "MyMarket", mymarket),
         ("galaxias", "Galaxias", galaxias),
         ("bazaar", "Bazaar", bazaar),
-        ("marketin", "Market In", marketin)
+        ("marketin", "Market In", marketin),
+        ("24hr", "24hr Stores", hr24),
     ]
     
     for store_id, store_name, scraper_func in stores:
