@@ -51,6 +51,37 @@ def parse_price_to_float(price_text):
     return value
 
 
+def _parse_24hr_price(price_text):
+    """Parse 24hr.gr prices using euro cent precision (e.g. 1.70, not 1.7)."""
+    if not price_text:
+        return None
+
+    cleaned = price_text.strip().replace("€", "").strip()
+    match = re.search(r"(\d+[.,]\d{2})(?:\D|$)", cleaned)
+    if match:
+        return round(float(match.group(1).replace(",", ".")), 2)
+
+    match = re.search(r"(\d+[.,]\d)(?:\D|$)", cleaned)
+    if match:
+        return round(float(f"{match.group(1).replace(',', '.')}0"), 2)
+
+    parsed = parse_price_to_float(price_text)
+    return round(parsed, 2) if parsed is not None else None
+
+
+def _write_json_with_price_decimals(path, data):
+    """Write JSON while keeping price fields at two decimal places."""
+    rendered = json.dumps(data, indent=2, ensure_ascii=False)
+    rendered = re.sub(
+        r'("price"\s*:\s*)(-?\d+(?:\.\d+)?)(?=\s*[,}\]])',
+        lambda match: f"{match.group(1)}{float(match.group(2)):.2f}",
+        rendered,
+    )
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(rendered)
+        file.write("\n")
+
+
 def ensure_chromedriver():
     """Install the matching ChromeDriver once per process."""
     global _CHROMEDRIVER_READY, _CHROMEDRIVER_ERROR
@@ -306,8 +337,7 @@ def update_price_history(prices):
     _rebuild_total_history(history)
     _trim_history_window(history["total"]["history"], timestamp)
 
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(history, f, indent=2, ensure_ascii=False)
+    _write_json_with_price_decimals(HISTORY_FILE, history)
 
 def get_driver():
     """Create a new Chrome driver instance with robust options"""
@@ -668,7 +698,7 @@ def hr24(url="https://www.24hr.gr/el/%CF%80%CF%81%CE%BF%CF%8A%CF%8C%CE%BD%CF%84%
             "#das-product-details-price, .das-product-details-price-value"
         )
         if price_element:
-            parsed = parse_price_to_float(price_element.get_text(strip=True))
+            parsed = _parse_24hr_price(price_element.get_text(strip=True))
             if parsed is not None:
                 return parsed
 
@@ -676,7 +706,7 @@ def hr24(url="https://www.24hr.gr/el/%CF%80%CF%81%CE%BF%CF%8A%CF%8C%CE%BD%CF%84%
             'input[name="final_price"][das-cart-key="final_price"]'
         )
         if final_price_input and final_price_input.get("value"):
-            return parse_price_to_float(final_price_input["value"])
+            return _parse_24hr_price(final_price_input["value"])
     except Exception as e:
         print(f"Error fetching 24hr.gr price: {e}")
     return None
@@ -735,13 +765,12 @@ def main():
             "available": price is not None
         }
         if price is not None:
-            print(f"{store_name}: €{price}")
+            print(f"{store_name}: €{price:.2f}")
         else:
             print(f"{store_name}: N/A")
     
     # Save to JSON file
-    with open('prices.json', 'w', encoding='utf-8') as f:
-        json.dump(prices, f, indent=2, ensure_ascii=False)
+    _write_json_with_price_decimals("prices.json", prices)
 
     update_price_history(prices)
     
