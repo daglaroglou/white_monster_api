@@ -1,15 +1,10 @@
 {
-  "last_updated": "2026-08-20T05:34:07.377906",
+  "last_updated": "2026-08-21T05:35:31.544484",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "total": {
     "name": "Average Market Price",
     "history": [
-      {
-        "timestamp": "2026-07-20T08:08:19.244304",
-        "price": 1.29,
-        "available_stores": 9
-      },
       {
         "timestamp": "2026-07-21T07:34:36.140967",
         "price": 1.29,
@@ -164,6 +159,11 @@
         "timestamp": "2026-08-20T05:34:07.377906",
         "price": 1.18,
         "available_stores": 9
+      },
+      {
+        "timestamp": "2026-08-21T05:35:31.544484",
+        "price": 1.18,
+        "available_stores": 9
       }
     ]
   },
@@ -172,10 +172,6 @@
       "name": "Masoutis",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.14
         },
@@ -297,6 +293,10 @@
         },
         {
           "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
           "price": 1.14
         }
       ]
@@ -305,10 +305,6 @@
       "name": "AB Vassilopoulos",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.14
         },
@@ -431,16 +427,16 @@
         {
           "timestamp": "2026-08-20T05:34:07.377906",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 1.14
         }
       ]
     },
     "sklavenitis": {
       "name": "Sklavenitis",
       "history": [
-        {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.12
-        },
         {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.12
@@ -487,10 +483,6 @@
       "name": "Kritikos",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.14
         },
@@ -612,6 +604,10 @@
         },
         {
           "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
           "price": 1.14
         }
       ]
@@ -620,10 +616,6 @@
       "name": "MyMarket",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.52
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.52
         },
@@ -745,6 +737,10 @@
         },
         {
           "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
           "price": 1.14
         }
       ]
@@ -753,10 +749,6 @@
       "name": "Galaxias",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.14
         },
@@ -878,6 +870,10 @@
         },
         {
           "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
           "price": 1.14
         }
       ]
@@ -886,10 +882,6 @@
       "name": "Bazaar",
       "history": [
         {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.14
         },
@@ -1012,16 +1004,16 @@
         {
           "timestamp": "2026-08-20T05:34:07.377906",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 1.14
         }
       ]
     },
     "marketin": {
       "name": "Market In",
       "history": [
-        {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.55
-        },
         {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.55
@@ -1145,16 +1137,16 @@
         {
           "timestamp": "2026-08-20T05:34:07.377906",
           "price": 0.99
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 0.99
         }
       ]
     },
     "24hr": {
       "name": "24hr Stores",
       "history": [
-        {
-          "timestamp": "2026-07-20T08:08:19.244304",
-          "price": 1.70
-        },
         {
           "timestamp": "2026-07-21T07:34:36.140967",
           "price": 1.70
