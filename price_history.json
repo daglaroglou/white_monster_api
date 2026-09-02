@@ -1,15 +1,10 @@
 {
-  "last_updated": "2026-09-01T09:49:38.770967",
+  "last_updated": "2026-09-02T09:22:36.707089",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "total": {
     "name": "Average Market Price",
     "history": [
-      {
-        "timestamp": "2026-08-02T07:33:42.975875",
-        "price": 1.45,
-        "available_stores": 8
-      },
       {
         "timestamp": "2026-08-03T08:31:42.952265",
         "price": 1.45,
@@ -159,6 +154,11 @@
         "timestamp": "2026-09-01T09:49:38.770967",
         "price": 1.31,
         "available_stores": 8
+      },
+      {
+        "timestamp": "2026-09-02T09:22:36.707089",
+        "price": 1.40,
+        "available_stores": 8
       }
     ]
   },
@@ -167,10 +167,6 @@
       "name": "Masoutis",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.52
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.52
         },
@@ -288,6 +284,10 @@
         },
         {
           "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
           "price": 1.14
         }
       ]
@@ -296,10 +296,6 @@
       "name": "AB Vassilopoulos",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.52
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.52
         },
@@ -417,6 +413,10 @@
         },
         {
           "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
           "price": 1.52
         }
       ]
@@ -428,10 +428,6 @@
     "kritikos": {
       "name": "Kritikos",
       "history": [
-        {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.52
-        },
         {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.52
@@ -558,10 +554,6 @@
       "name": "MyMarket",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.14
         },
@@ -680,16 +672,16 @@
         {
           "timestamp": "2026-09-01T09:49:38.770967",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.52
         }
       ]
     },
     "galaxias": {
       "name": "Galaxias",
       "history": [
-        {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.52
-        },
         {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.52
@@ -808,10 +800,6 @@
       "name": "Bazaar",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.14
         },
@@ -930,6 +918,10 @@
         {
           "timestamp": "2026-09-01T09:49:38.770967",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.10
         }
       ]
     },
@@ -937,10 +929,6 @@
       "name": "Market In",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.55
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.55
         },
@@ -1059,6 +1047,10 @@
         {
           "timestamp": "2026-09-01T09:49:38.770967",
           "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.55
         }
       ]
     },
@@ -1066,10 +1058,6 @@
       "name": "24hr Stores",
       "history": [
         {
-          "timestamp": "2026-08-02T07:33:42.975875",
-          "price": 1.70
-        },
-        {
           "timestamp": "2026-08-03T08:31:42.952265",
           "price": 1.70
         },
@@ -1187,6 +1175,10 @@
         },
         {
           "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
           "price": 1.70
         }
       ]
