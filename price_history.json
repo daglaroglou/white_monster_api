@@ -1,15 +1,10 @@
 {
-  "last_updated": "2026-09-05T08:52:54.080146",
+  "last_updated": "2026-09-06T09:13:03.986769",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "total": {
     "name": "Average Market Price",
     "history": [
-      {
-        "timestamp": "2026-08-06T07:42:22.945950",
-        "price": 1.31,
-        "available_stores": 8
-      },
       {
         "timestamp": "2026-08-07T06:10:51.323639",
         "price": 1.31,
@@ -159,6 +154,11 @@
         "timestamp": "2026-09-05T08:52:54.080146",
         "price": 1.40,
         "available_stores": 8
+      },
+      {
+        "timestamp": "2026-09-06T09:13:03.986769",
+        "price": 1.40,
+        "available_stores": 8
       }
     ]
   },
@@ -166,10 +166,6 @@
     "masoutis": {
       "name": "Masoutis",
       "history": [
-        {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.14
-        },
         {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.14
@@ -296,10 +292,6 @@
       "name": "AB Vassilopoulos",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.14
         },
@@ -417,6 +409,10 @@
         },
         {
           "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
           "price": 1.52
         }
       ]
@@ -429,10 +425,6 @@
       "name": "Kritikos",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.14
         },
@@ -551,16 +543,16 @@
         {
           "timestamp": "2026-09-05T08:52:54.080146",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
+          "price": 1.14
         }
       ]
     },
     "mymarket": {
       "name": "MyMarket",
       "history": [
-        {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.52
-        },
         {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.52
@@ -687,10 +679,6 @@
       "name": "Galaxias",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.14
         },
@@ -792,10 +780,6 @@
       "name": "Bazaar",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.14
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.14
         },
@@ -913,6 +897,10 @@
         },
         {
           "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
           "price": 1.10
         }
       ]
@@ -921,10 +909,6 @@
       "name": "Market In",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.55
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.55
         },
@@ -1042,6 +1026,10 @@
         },
         {
           "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.55
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
           "price": 1.55
         }
       ]
@@ -1050,10 +1038,6 @@
       "name": "24hr Stores",
       "history": [
         {
-          "timestamp": "2026-08-06T07:42:22.945950",
-          "price": 1.70
-        },
-        {
           "timestamp": "2026-08-07T06:10:51.323639",
           "price": 1.70
         },
@@ -1171,6 +1155,10 @@
         },
         {
           "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
           "price": 1.70
         }
       ]
