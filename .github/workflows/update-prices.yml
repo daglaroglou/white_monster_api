@@ -2,7 +2,7 @@ name: Update Prices
 
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 8 * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: '3.14'
     
     - name: Install dependencies
       run: |
