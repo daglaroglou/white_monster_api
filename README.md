@@ -1,116 +1,155 @@
-# 🛒 White Monster Price Tracker API
+<div align="center">
 
-Automated price tracking for Monster Energy Zero Ultra 500ml across multiple Greek supermarkets.
+# 🥤 White Monster Price Tracker
 
-## 🌟 Features
+**Live price tracking for Monster Energy Zero Ultra 500ml across Greek supermarkets.**
 
-- **Automated Updates**: Prices are updated every 6 hours via GitHub Actions
-- **Public API**: Access current prices via a simple JSON API
-- **Web Interface**: Beautiful dashboard to view prices
-- **Multi-Store Coverage**: Tracks prices from 9 different supermarkets
+[![Live Site](https://img.shields.io/badge/Live_Site-dag.is--a.dev-0070F3?style=for-the-badge&logo=github)](https://dag.is-a.dev/white_monster_api/)
+[![License](https://img.shields.io/badge/License-MIT-111111?style=for-the-badge)](LICENSE)
+[![Prices Updated](https://img.shields.io/badge/Prices-Updated_Daily-4ade80?style=for-the-badge&logo=clockify&logoColor=white)](https://daglaroglou.github.io/white_monster_api/prices.json)
 
-## 🏪 Tracked Stores
+[**View Live →**](https://dag.is-a.dev/white_monster_api/)
 
-- Masoutis
-- AB Vassilopoulos
-- Sklavenitis
-- Kritikos
-- MyMarket
-- Galaxias
-- Bazaar
-- Market In
-- 24hr Stores
+</div>
 
-## 📡 API Usage
+---
 
-### API Endpoint
+## What is this?
+
+A fully automated price tracker that scrapes **Monster Energy Zero Ultra 500ml** prices from **9 major Greek supermarkets** every day, stores the data as JSON, and presents it through a polished, interactive dashboard — complete with an interactive 3D can model, per-store sparkline charts, and a free public API.
+
+Prices update automatically at **11:00 AM Greek time** via GitHub Actions. The scraper runs, commits fresh data, and triggers a rebuild — zero manual intervention.
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 📊 Live Dashboard
+A bento-grid layout with animated cards showing each store's current price and 30-day price history sparkline — at a glance, you know where the cheapest can is.
+
+### 🧊 Interactive 3D Can
+A WebGL-rendered Monster Energy can you can grab and spin, floating with particle effects. Built with Three.js and React Three Fiber.
+
+### 🌗 Light / Dark Mode
+Theme toggle with a custom fizzy bubble transition — 220 animated circles rise and cover the screen like carbonation bubbles while the palette swaps underneath.
+
+</td>
+<td width="50%">
+
+### 🔌 Free Public API
+A static JSON endpoint anyone can hit — no auth, no rate limits, no API keys. Fetch the latest prices from JavaScript, Python, cURL, or anything that speaks HTTP.
+
+### 📈 30-Day Price History
+Per-store and market-average history with interactive Recharts line graphs. Hover any point to see the exact date and price.
+
+### ⚡ Fully Automated
+A GitHub Actions cron job scrapes all 9 stores daily using Playwright, commits the data, and deploys a fresh static build to GitHub Pages — hands-off.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏪 Tracked Supermarkets
+
+| Store | Website |
+|:------|:--------|
+| **Masoutis** | [masoutis.gr](https://www.masoutis.gr) |
+| **AB Vassilopoulos** | [ab.gr](https://www.ab.gr) |
+| **Sklavenitis** | [sklavenitis.gr](https://www.sklavenitis.gr) |
+| **Kritikos** | [kritikos-sm.gr](https://kritikos-sm.gr) |
+| **MyMarket** | [mymarket.gr](https://www.mymarket.gr) |
+| **Galaxias** | [galaxias.shop](https://galaxias.shop) |
+| **Bazaar** | [bazaar-online.gr](https://www.bazaar-online.gr) |
+| **Market In** | [market-in.gr](https://www.market-in.gr) |
+| **24hr Stores** | [24hr.gr](https://www.24hr.gr) |
+
+---
+
+## 🔌 API
+
+The price data is served as a static JSON file — no backend needed.
+
+### Endpoint
 
 ```
-https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json
+GET  https://dag.is-a.dev/white_monster_api/prices.json
 ```
 
-### History Endpoint
-
-```
-https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/price_history.json
-```
-
-### Web Dashboard
-
-```
-https://dag.is-a.dev/white_monster_api/
-```
-
-### Response Format
+### Response
 
 ```json
 {
-  "last_updated": "2025-10-16T12:00:00",
+  "last_updated": "2026-09-11T09:25:20.879285",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
-    "masoutis": {
-      "name": "Masoutis",
-      "price": 1.49,
-      "available": true
-    },
-    ...
+    "masoutis": { "name": "Masoutis", "price": 1.14, "available": true },
+    "ab": { "name": "AB Vassilopoulos", "price": 1.09, "available": true },
+    "sklavenitis": { "name": "Sklavenitis", "price": null, "available": false },
+    "kritikos": { "name": "Kritikos", "price": 1.14, "available": true },
+    "mymarket": { "name": "MyMarket", "price": 1.52, "available": true },
+    "galaxias": { "name": "Galaxias", "price": null, "available": false },
+    "bazaar": { "name": "Bazaar", "price": 1.10, "available": true },
+    "marketin": { "name": "Market In", "price": 1.55, "available": true },
+    "24hr": { "name": "24hr Stores", "price": 1.70, "available": true }
   }
 }
 ```
 
-## 💻 Usage Examples
+### Quick Start
 
-### JavaScript
+<details>
+<summary><strong>JavaScript</strong></summary>
 
-```javascript
-fetch('https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json')
-  .then(response => response.json())
-  .then(data => {
-    console.log('Latest prices:', data);
-    // Find the cheapest price
-    const prices = Object.values(data.stores)
-      .filter(store => store.available)
-      .map(store => store.price);
-    const cheapest = Math.min(...prices);
-    console.log('Cheapest price:', cheapest);
-  });
+```js
+fetch('https://daglaroglou.github.io/white_monster_api/prices.json')
+  .then(res => res.json())
+  .then(data => console.log(data));
 ```
+</details>
 
-### Python
+<details>
+<summary><strong>Python</strong></summary>
 
 ```python
 import requests
 
-response = requests.get('https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json')
+response = requests.get('https://dag.is-a.dev/white_monster_api/prices.json')
 prices = response.json()
-
-# Find the cheapest store
-available_stores = {k: v for k, v in prices['stores'].items() if v['available']}
-cheapest_store = min(available_stores.items(), key=lambda x: x[1]['price'])
-
-print(f"Cheapest at {cheapest_store[1]['name']}: €{cheapest_store[1]['price']}")
 ```
+</details>
 
-### cURL
+<details>
+<summary><strong>cURL</strong></summary>
 
 ```bash
-curl https://raw.githubusercontent.com/daglaroglou/white_monster_api/main/prices.json
+curl https://dag.is-a.dev/white_monster_api/prices.json
 ```
+</details>
 
-## ⏰ Update Schedule
+---
 
-The prices are automatically updated once per day at **08:00 Greece time** (`Europe/Athens`) by GitHub Actions.
+## 🧰 Tech Stack
 
-You can also manually trigger an update from the Actions tab.
+| Layer | Technology |
+|:------|:-----------|
+| **Frontend** | [Next.js 16](https://nextjs.org/) · [React 19](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/) |
+| **3D** | [Three.js](https://threejs.org/) · [React Three Fiber](https://r3f.docs.pmnd.rs/) · [Drei](https://drei.docs.pmnd.rs/) |
+| **Charts** | [Recharts](https://recharts.org/) |
+| **Motion** | [Motion](https://motion.dev/) (Framer Motion) |
+| **Icons** | [Phosphor Icons](https://phosphoricons.com/) |
+| **Scraping** | [Playwright](https://playwright.dev/) · [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) · Python |
+| **CI/CD** | [GitHub Actions](https://github.com/features/actions) · [GitHub Pages](https://pages.github.com/) |
+| **Fonts** | [Geist Sans & Mono](https://vercel.com/font) |
 
-## 📝 License
+---
 
-MIT License - Feel free to use and modify as needed.
+## 📄 License
 
-## ⚠️ Disclaimer
-
-This project is for educational purposes. Please respect the terms of service of the websites being scraped. Consider implementing rate limiting and caching to minimize server load.
-
-This is not endorsed by Monster Energy.
-
+[MIT](LICENSE) © [Christos Daglaroglou](https://dag.is-a.dev)
