@@ -108,7 +108,7 @@ GET  https://dag.is-a.dev/white_monster_api/prices.json
 <summary><strong>JavaScript</strong></summary>
 
 ```js
-fetch('https://daglaroglou.github.io/white_monster_api/prices.json')
+fetch('https://dag.is-a.dev/white_monster_api/prices.json')
   .then(res => res.json())
   .then(data => console.log(data));
 ```
