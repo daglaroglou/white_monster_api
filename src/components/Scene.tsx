@@ -6,10 +6,12 @@ import { Environment, Float, PresentationControls, useGLTF } from '@react-three/
 import { useRef, useState, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 
+const modelPath = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/model/white_monster_converted.glb`;
+
 function MonsterCan() {
   const group = useRef<THREE.Group>(null);
   // Load the GLB file with textures and materials built-in
-  const gltf = useGLTF(`/model/white_monster_converted.glb`);
+  const gltf = useGLTF(modelPath);
 
   // Calculate bounding box, scale, and centering offset
   const { scale, centerOffset, isZUp } = useMemo(() => {
@@ -66,7 +68,7 @@ function MonsterCan() {
 
 // Preload the GLB so it's ready instantly
 if (typeof window !== 'undefined') {
-  useGLTF.preload(`/model/white_monster_converted.glb`);
+  useGLTF.preload(modelPath);
 }
 
 function ParticleField() {

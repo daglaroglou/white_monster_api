@@ -8,8 +8,11 @@ try {
   // Ignore
 }
 
+const basePath = '/white_monster_api';
+
 const nextConfig: NextConfig = {
   /* config options here */
+  basePath,
   reactStrictMode: false,
   output: 'export',
   images: {
@@ -19,6 +22,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.ngrok-free.app"],
   env: {
     NEXT_PUBLIC_COMMIT_SHA: commitSha,
+    NEXT_PUBLIC_BASE_PATH: basePath,
   }
 };
 
