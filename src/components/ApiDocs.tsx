@@ -8,7 +8,7 @@ export function ApiDocs() {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [activeTab, setActiveTab] = useState<'fetch' | 'python' | 'curl'>('fetch');
 
-  const apiUrl = "https://dag.is-a.dev/prices.json";
+  const apiUrl = "https://dag.is-a.dev/white_monster_api/prices.json";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(apiUrl);
