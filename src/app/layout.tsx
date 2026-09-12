@@ -18,16 +18,16 @@ export const metadata: Metadata = {
   keywords: ["Monster Energy", "price tracker", "API", "Greece", "supermarkets", "Ultra Zero", "24hr Stores", "Masoutis", "Sklavenitis"],
   authors: [{ name: "daglaroglou" }],
   icons: {
-    icon: "https://github.com/daglaroglou/white_monster_api/blob/main/img/logo.png?raw=true"
+    icon: "/white_monster_api/img/logo.png"
   },
   openGraph: {
     type: "website",
     title: "White Monster Price Tracker API",
     description: "Track White Monster Energy 500ml prices across 9 Greek supermarkets including 24hr Stores.",
-    url: "https://dag.is-a.dev/",
+    url: "https://dag.is-a.dev/white_monster_api/",
     siteName: "White Monster Price Tracker",
     images: [{
-      url: "https://dag.is-a.dev/img/logo.png"
+      url: "https://dag.is-a.dev/white_monster_api/img/logo.png"
     }]
   }
 };
