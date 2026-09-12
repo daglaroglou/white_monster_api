@@ -1,0 +1,92 @@
+:root {
+  --canvas-bg: #FBFBFA;
+  --card-bg: #FFFFFF;
+  --text-primary: #111111;
+  --text-secondary: #787774;
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  --accent-blue: #0070F3;
+  --accent-red: #E00;
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --scene-bg-inner: #F9F9F8;
+  --scene-bg-outer: #FFFFFF;
+  
+  --selection-bg: #c4d6df;
+  --selection-color: #111111;
+}
+
+.dark {
+  --canvas-bg: #0A0A0A;
+  --card-bg: #141414;
+  --text-primary: #EDEDED;
+  --text-secondary: #888888;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  --scene-bg-inner: #1E1E1E;
+  --scene-bg-outer: #141414;
+  
+  --selection-bg: #4a5c66;
+  --selection-color: #ffffff;
+}
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-color);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  background-color: var(--canvas-bg);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Recharts Customization for Minimalist Look */
+.recharts-cartesian-axis-tick-value {
+  fill: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-geist-sans);
+}
+.recharts-tooltip-wrapper,
+.recharts-wrapper,
+.recharts-surface,
+.recharts-wrapper * {
+  outline: none !important;
+}
