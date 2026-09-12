@@ -6,7 +6,7 @@ import { Environment, Float, PresentationControls, useGLTF } from '@react-three/
 import { useRef, useState, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 
-const modelPath = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/model/white_monster_converted.glb`;
+const modelPath = '/white_monster_api/model/white_monster_converted.glb';
 
 function MonsterCan() {
   const group = useRef<THREE.Group>(null);
