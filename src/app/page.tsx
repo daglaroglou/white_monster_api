@@ -243,23 +243,21 @@ function NextUpdateCountdown() {
 export default function Home() {
 
   const formatTimestamp = (isoTs: string) => {
+    // Basic manual formatting to prevent hydration mismatch
     const dt = new Date(isoTs);
-    return dt.toLocaleString('en-GB', {
-      timeZone: 'Europe/Athens',
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    // Approximate Europe/Athens (UTC+2 or UTC+3). For safety, we just use UTC for UI consistency across clients
+    const day = dt.getUTCDate().toString().padStart(2, '0');
+    const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getUTCMonth()];
+    const hours = dt.getUTCHours().toString().padStart(2, '0');
+    const minutes = dt.getUTCMinutes().toString().padStart(2, '0');
+    return `${day} ${month}, ${hours}:${minutes} UTC`;
   };
 
   const formatShortDate = (isoTs: string) => {
     const dt = new Date(isoTs);
-    return dt.toLocaleString('en-GB', {
-      timeZone: 'Europe/Athens',
-      day: 'numeric',
-      month: 'short',
-    });
+    const day = dt.getUTCDate().toString();
+    const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getUTCMonth()];
+    return `${day} ${month}`;
   };
 
   const chartData = data?.total?.history?.map(pt => ({
@@ -293,7 +291,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.1 }}
         >
-          <div className={styles.eyebrow}>
+          <div className={styles.eyebrow} suppressHydrationWarning>
             <Clock size={14} weight="bold" />
             Updated {data?.last_updated ? formatTimestamp(data.last_updated) : 'Unknown'}
           </div>
