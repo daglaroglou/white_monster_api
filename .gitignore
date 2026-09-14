@@ -19,6 +19,7 @@
 /playwright/.cache/
 /blob-report/
 /tests/
+.playwright-mcp/
 
 # next.js
 /.next/

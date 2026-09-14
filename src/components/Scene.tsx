@@ -124,6 +124,14 @@ function ParticleField() {
   );
 }
 
+function Reporter() {
+  useEffect(() => {
+    // This will only run once the Canvas Suspense resolves (i.e. model is loaded)
+    window.dispatchEvent(new Event('scene-rendered'));
+  }, []);
+  return null;
+}
+
 export default function Scene() {
   return (
     <div id="canvas-container" style={{ width: '100%', height: '100%' }}>
@@ -153,6 +161,8 @@ export default function Scene() {
 
         {/* 'city' preset provides much softer, diffuse reflections compared to 'studio' */}
         <Environment preset="city" resolution={128} />
+        
+        <Reporter />
       </Canvas>
     </div>
   );

@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 const Scene = dynamic(() => import('@/components/Scene'), { ssr: false });
 import { ApiDocs } from '@/components/ApiDocs';
 import { StoreIcon } from '@/components/StoreIcon';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import priceDataRaw from '../../price_history.json';
 import styles from './page.module.css';
 
@@ -281,6 +282,7 @@ export default function Home() {
 
   return (
     <div className={styles.layout}>
+      <LoadingScreen />
       <ThemeToggle />
       <div className={styles.bentoGrid}>
 
