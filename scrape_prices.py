@@ -228,7 +228,10 @@ async def ab(page):
 async def sklavenitis(page):
     url = "https://www.sklavenitis.gr/anapsyktika-nera-chymoi/energeiaka-pota-ice-tea-ice-coffee/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"
     await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-    el = await page.wait_for_selector(".price", timeout=10000, state="attached")
+    try:
+        await page.wait_for_selector(".price, [data-price]", timeout=15000, state="attached")
+    except Exception:
+        pass
     html = await page.content()
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, 'html.parser')
@@ -236,64 +239,29 @@ async def sklavenitis(page):
     price_div = soup.find('div', class_='price')
     if price_div:
         return parse_price_to_float(price_div.get_text(strip=True))
+    # Fallback checking any data-price
+    fallback = soup.find(attrs={'data-price': True})
+    if fallback:
+        return parse_price_to_float(fallback['data-price'])
     return None
 
 async def kritikos(page):
     url = "https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"
-    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-    # The selector requires matching 'ProductDetails_price__'
-    html = await page.content()
-    soup = BeautifulSoup(html, 'html.parser')
-    price_element = soup.find('span', class_=lambda x: x and 'ProductDetails_price__' in x and 'grey' not in x.lower())
-    if price_element:
-        return parse_price_to_float(price_element.get_text(strip=True))
-    return None
-
-def _extract_mymarket_price(soup, page_source):
-    for script_tag in soup.select("script[type='application/ld+json']"):
-        raw_json = script_tag.get_text(strip=True)
-        if not raw_json: continue
-        try:
-            payload = json.loads(raw_json)
-        except Exception: continue
-        nodes = []
-        if isinstance(payload, dict) and isinstance(payload.get("@graph"), list):
-            nodes = [node for node in payload["@graph"] if isinstance(node, dict)]
-        elif isinstance(payload, dict): nodes = [payload]
-        elif isinstance(payload, list): nodes = [node for node in payload if isinstance(node, dict)]
-        for node in nodes:
-            if node.get("@type") != "Product": continue
-            offers = node.get("offers")
-            if isinstance(offers, dict):
-                schema_price = offers.get("price")
-                parsed = parse_price_to_float(str(schema_price)) if schema_price is not None else None
-                if parsed is not None: return parsed
-
-    def is_per_unit(text):
-        if not text: return False
-        lower = text.lower()
-        return any(x in lower for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', '/lt', 'lt.', 'ανά λίτρο', 'ανά lt', 'ανά l', '€/lt', '€/λ', '/λ', 'ανά λ'])
+    # Using networkidle to ensure Next.js has hydrated the UI
+    await page.goto(url, wait_until="networkidle", timeout=30000)
     
-    preferred_selectors = [".product-display-price", ".product-summary .selling-unit-row", "span.product-full--final-price", ".product-full--final-price", "span.product-full--price", "[data-testid='product-price']", "[data-testid='final-price']"]
-    for sel in preferred_selectors:
-        el = soup.select_one(sel)
-        if not el: continue
-        price_text = el.get_text(strip=True)
-        if not price_text or is_per_unit(price_text): continue
-        split_price_match = re.search(r"€?\s*(\d{1,2})\s+(\d{2})\b", price_text)
-        if split_price_match:
-            combined_price = f"{split_price_match.group(1)}.{split_price_match.group(2)}"
-            return parse_price_to_float(combined_price)
-        parsed = parse_price_to_float(price_text)
-        if parsed is not None: return parsed
-
-    for m in re.finditer(r"(\d+[.,]\d{1,2})\s*€", page_source):
-        span_start = max(0, m.start() - 20)
-        span_end = min(len(page_source), m.end() + 20)
-        context = page_source[span_start:span_end].lower()
-        if any(x in context for x in ['/l', '€/l', 'ltr', 'lt', 'λίτρο', 'ανά']): continue
-        parsed = parse_price_to_float(m.group(1))
-        if parsed is not None: return parsed
+    try:
+        # Extract the full rendered text of the page
+        text = await page.locator("body").inner_text()
+        
+        # Look for the piece price formatted as "€ X.XX ανά"
+        import re
+        match = re.search(r'€\s*(\d+[.,]\d{2})\s*ανά', text)
+        if match:
+            return parse_price_to_float(match.group(1))
+    except Exception as e:
+        print(f"Kritikos extraction error: {e}")
+        
     return None
 
 async def mymarket(page):
@@ -319,7 +287,29 @@ async def mymarket(page):
 
     page_source = await page.content()
     soup = BeautifulSoup(page_source, 'html.parser')
-    return _extract_mymarket_price(soup, page_source)
+    
+    for script_tag in soup.select("script[type='application/ld+json']"):
+        raw_json = script_tag.get_text(strip=True)
+        if not raw_json: continue
+        try:
+            payload = json.loads(raw_json)
+        except Exception: continue
+        
+        nodes = []
+        if isinstance(payload, dict) and isinstance(payload.get("@graph"), list):
+            nodes = [node for node in payload["@graph"] if isinstance(node, dict)]
+        elif isinstance(payload, dict): nodes = [payload]
+        elif isinstance(payload, list): nodes = [node for node in payload if isinstance(node, dict)]
+        
+        for node in nodes:
+            if node.get("@type") != "Product": continue
+            offers = node.get("offers")
+            if isinstance(offers, dict):
+                schema_price = offers.get("price")
+                parsed = parse_price_to_float(str(schema_price)) if schema_price is not None else None
+                if parsed is not None: return parsed
+
+    return None
 
 async def galaxias(page):
     url = "https://galaxias.shop/product/5060337501125"
@@ -333,9 +323,13 @@ async def bazaar(page):
     await page.goto(url, wait_until="domcontentloaded", timeout=30000)
     # Use locator.first to handle multiple matches where the first might be hidden or we just want the text
     el = page.locator(".new_price").first
-    await el.wait_for(timeout=10000)
-    text = await el.inner_text()
-    return parse_price_to_float(text)
+    try:
+        await el.wait_for(state="attached", timeout=15000)
+        text = await el.evaluate("el => el.textContent")
+        return parse_price_to_float(text)
+    except Exception:
+        pass
+    return None
 
 async def marketin(page):
     url = "https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"
@@ -403,9 +397,7 @@ async def main_async():
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        )
+        context = await browser.new_context()
         
         # Schedule all playright tasks + 1 requests task
         tasks = [fetch_store(context, s_id, s_name, func) for s_id, s_name, func in stores]

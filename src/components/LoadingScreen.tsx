@@ -54,7 +54,7 @@ export function LoadingScreen() {
             {/* Empty Silhouette (Background) */}
             <div style={{ position: 'absolute', inset: 0, opacity: 0.15, filter: 'grayscale(100%)' }}>
               <Image
-                src="/img/monster.png"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/img/monster.png`}
                 alt="Loading..."
                 fill
                 style={{ objectFit: 'contain' }}
@@ -69,7 +69,7 @@ export function LoadingScreen() {
               style={{ position: 'absolute', inset: 0 }}
             >
               <Image
-                src="/img/monster.png"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/img/monster.png`}
                 alt="Loading..."
                 fill
                 style={{ objectFit: 'contain' }}
