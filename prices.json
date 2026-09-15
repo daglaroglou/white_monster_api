@@ -1,52 +1,68 @@
 {
-  "last_updated": "2026-09-15T10:10:36.829682",
+  "last_updated": "2026-09-15T14:43:28.903833",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
-    "masoutis": {
-      "name": "Masoutis",
-      "price": 1.14,
-      "available": true
+    "halkiadakis": {
+      "name": "Halkiadakis",
+      "price": 0.98,
+      "available": true,
+      "is_discount": false
     },
     "ab": {
       "name": "AB Vassilopoulos",
       "price": 1.09,
-      "available": true
-    },
-    "sklavenitis": {
-      "name": "Sklavenitis",
-      "price": null,
-      "available": false
-    },
-    "kritikos": {
-      "name": "Kritikos",
-      "price": 1.14,
-      "available": true
-    },
-    "mymarket": {
-      "name": "MyMarket",
-      "price": 1.52,
-      "available": true
-    },
-    "galaxias": {
-      "name": "Galaxias",
-      "price": null,
-      "available": false
+      "available": true,
+      "is_discount": false
     },
     "bazaar": {
       "name": "Bazaar",
       "price": 1.10,
-      "available": true
+      "available": true,
+      "is_discount": true
     },
-    "marketin": {
-      "name": "Market In",
-      "price": 1.55,
-      "available": true
+    "sklavenitis": {
+      "name": "Sklavenitis",
+      "price": 1.12,
+      "available": true,
+      "is_discount": true
+    },
+    "masoutis": {
+      "name": "Masoutis",
+      "price": 1.14,
+      "available": true,
+      "is_discount": true
+    },
+    "kritikos": {
+      "name": "Kritikos",
+      "price": 1.14,
+      "available": true,
+      "is_discount": false
+    },
+    "synka": {
+      "name": "Synka",
+      "price": 1.15,
+      "available": true,
+      "is_discount": false
+    },
+    "galaxias": {
+      "name": "Galaxias",
+      "price": 1.52,
+      "available": true,
+      "is_discount": false
+    },
+    "mymarket": {
+      "name": "MyMarket",
+      "price": 1.52,
+      "available": true,
+      "is_discount": false
     },
     "24hr": {
       "name": "24hr Stores",
       "price": 1.70,
-      "available": true
+      "available": true,
+      "is_discount": false
     }
-  }
+  },
+  "description": "\"Κάποιοι άνθρωποι δεν ικανοποιούνται με τίποτα. Μόλις πάρουν αυτό που νόμιζαν οτι ήθελαν, θέλουν πάντα περισσότερα. Οι οδηγοί των ομάδων μας και τα Monster Girls δε διαφέρουν - μας το έλεγαν με υπονοούμενα τώρα τελευταία. Μας ζητούσαν ένα νέο ποτό Monster. Λίγο λιγότερο γλυκό, με πιο ελαφριά γεύση και μηδέν θερμίδες, αλλά με μια γεμάτη δόση του ενεργειακού μας μείγματος Monster. Χωρίς αμφιβολία. το λευκό είναι το νέο μαύρο. Ορίστε! Monster Energy Ultra. \n\nUnleash the Ultra Beast!\"\n\n Κάποιοι άνθρωποι δεν ικανοποιούνται με τίποτα. Μόλις πάρουν αυτό που νόμιζαν ότι ήθελαν, θέλουν πάντα περισσότερα. Οι οδηγοί των ομάδων μας και τα Monster Girls δε διαφέρουν - μας το έλεγαν με υπονοούμενα τώρα τελευταία.\nΜας ζητούσαν ένα νέο ποτό Monster. Λίγο λιγότερο γλυκό, με πιο ελαφριά γεύση και μηδέν ζάχαρη, αλλά με μια γεμάτη δόση του ενεργειακού μας μείγματος Monster.\nΧωρίς αμφιβολία, το λευκό είναι το νέο μαύρο. Ορίστε! Monster Energy Ultra"
 }

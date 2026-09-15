@@ -1,164 +1,200 @@
 {
-  "last_updated": "2026-09-15T10:10:36.829682",
+  "last_updated": "2026-09-15T14:43:28.903833",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
+  "description": "\"Κάποιοι άνθρωποι δεν ικανοποιούνται με τίποτα. Μόλις πάρουν αυτό που νόμιζαν οτι ήθελαν, θέλουν πάντα περισσότερα. Οι οδηγοί των ομάδων μας και τα Monster Girls δε διαφέρουν - μας το έλεγαν με υπονοούμενα τώρα τελευταία. Μας ζητούσαν ένα νέο ποτό Monster. Λίγο λιγότερο γλυκό, με πιο ελαφριά γεύση και μηδέν θερμίδες, αλλά με μια γεμάτη δόση του ενεργειακού μας μείγματος Monster. Χωρίς αμφιβολία. το λευκό είναι το νέο μαύρο. Ορίστε! Monster Energy Ultra. \n\nUnleash the Ultra Beast!\"\n\n Κάποιοι άνθρωποι δεν ικανοποιούνται με τίποτα. Μόλις πάρουν αυτό που νόμιζαν ότι ήθελαν, θέλουν πάντα περισσότερα. Οι οδηγοί των ομάδων μας και τα Monster Girls δε διαφέρουν - μας το έλεγαν με υπονοούμενα τώρα τελευταία.\nΜας ζητούσαν ένα νέο ποτό Monster. Λίγο λιγότερο γλυκό, με πιο ελαφριά γεύση και μηδέν ζάχαρη, αλλά με μια γεμάτη δόση του ενεργειακού μας μείγματος Monster.\nΧωρίς αμφιβολία, το λευκό είναι το νέο μαύρο. Ορίστε! Monster Energy Ultra",
   "total": {
     "name": "Average Market Price",
     "history": [
       {
         "timestamp": "2026-08-16T05:31:08.041476",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-17T05:37:38.570951",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-18T05:32:54.255187",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-19T05:33:49.021056",
-        "price": 1.26,
-        "available_stores": 8
+        "price": 1.21,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-20T05:34:07.377906",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-21T05:35:31.544484",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-22T05:30:28.086685",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-23T05:32:19.807388",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-24T05:40:35.173877",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-25T05:34:15.182881",
-        "price": 1.19,
-        "available_stores": 8
+        "price": 1.16,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-26T05:37:02.958346",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-27T16:14:16.617889",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-28T17:12:55.526640",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-29T11:31:12.440962",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-30T10:22:13.731502",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-08-31T11:27:14.754247",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-01T09:49:38.770967",
-        "price": 1.31,
-        "available_stores": 8
+        "price": 1.25,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-02T09:22:36.707089",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-03T09:31:36.813419",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-04T09:23:46.999440",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-05T08:52:54.080146",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-06T09:13:03.986769",
-        "price": 1.40,
-        "available_stores": 8
+        "price": 1.31,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-07T10:00:42.647615",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-08T09:26:23.238571",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-09T09:27:41.923370",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-10T09:26:42.095487",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-11T09:25:20.879285",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-12T09:05:55.148619",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-13T12:56:10.696353",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-14T14:33:54.694681",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
       },
       {
         "timestamp": "2026-09-15T10:10:36.829682",
-        "price": 1.34,
-        "available_stores": 8
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T13:17:35.807847",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T13:17:55.601147",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T13:50:30.979625",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T13:53:46.679622",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T14:26:46.995871",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T14:39:57.491183",
+        "price": 1.27,
+        "available_stores": 11
+      },
+      {
+        "timestamp": "2026-09-15T14:43:28.903833",
+        "price": 1.27,
+        "available_stores": 11
       }
     ]
   },
@@ -289,8 +325,37 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.14
         }
-      ]
+      ],
+      "is_discount": true
     },
     "ab": {
       "name": "AB Vassilopoulos",
@@ -418,12 +483,195 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.09
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.09
         }
-      ]
+      ],
+      "is_discount": false
     },
     "sklavenitis": {
       "name": "Sklavenitis",
-      "history": []
+      "history": [
+        {
+          "timestamp": "2026-08-16T05:31:08.041476",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-17T05:37:38.570951",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-18T05:32:54.255187",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-19T05:33:49.021056",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-22T05:30:28.086685",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-23T05:32:19.807388",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-24T05:40:35.173877",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-25T05:34:15.182881",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-26T05:37:02.958346",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-27T16:14:16.617889",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-28T17:12:55.526640",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-29T11:31:12.440962",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-30T10:22:13.731502",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-08-31T11:27:14.754247",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-03T09:31:36.813419",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-04T09:23:46.999440",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-07T10:00:42.647615",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-08T09:26:23.238571",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-09T09:27:41.923370",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-10T09:26:42.095487",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-11T09:25:20.879285",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-12T09:05:55.148619",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-13T12:56:10.696353",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-14T14:33:54.694681",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T10:10:36.829682",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.12
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.12
+        }
+      ],
+      "is_discount": true
     },
     "kritikos": {
       "name": "Kritikos",
@@ -551,8 +799,37 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.14
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.14
         }
-      ]
+      ],
+      "is_discount": false
     },
     "mymarket": {
       "name": "MyMarket",
@@ -680,8 +957,37 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.52
         }
-      ]
+      ],
+      "is_discount": false
     },
     "galaxias": {
       "name": "Galaxias",
@@ -745,8 +1051,101 @@
         {
           "timestamp": "2026-08-30T10:22:13.731502",
           "price": 1.52
+        },
+        {
+          "timestamp": "2026-08-31T11:27:14.754247",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-03T09:31:36.813419",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-04T09:23:46.999440",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-07T10:00:42.647615",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-08T09:26:23.238571",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-09T09:27:41.923370",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-10T09:26:42.095487",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-11T09:25:20.879285",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-12T09:05:55.148619",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-13T12:56:10.696353",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-14T14:33:54.694681",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T10:10:36.829682",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.52
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.52
         }
-      ]
+      ],
+      "is_discount": false
     },
     "bazaar": {
       "name": "Bazaar",
@@ -874,8 +1273,37 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.10
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.10
         }
-      ]
+      ],
+      "is_discount": true
     },
     "marketin": {
       "name": "Market In",
@@ -1132,8 +1560,353 @@
         {
           "timestamp": "2026-09-15T10:10:36.829682",
           "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.70
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.70
         }
-      ]
+      ],
+      "is_discount": false
+    },
+    "halkiadakis": {
+      "name": "Halkiadakis",
+      "history": [
+        {
+          "timestamp": "2026-08-16T05:31:08.041476",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-17T05:37:38.570951",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-18T05:32:54.255187",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-19T05:33:49.021056",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-22T05:30:28.086685",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-23T05:32:19.807388",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-24T05:40:35.173877",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-25T05:34:15.182881",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-26T05:37:02.958346",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-27T16:14:16.617889",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-28T17:12:55.526640",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-29T11:31:12.440962",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-30T10:22:13.731502",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-08-31T11:27:14.754247",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-03T09:31:36.813419",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-04T09:23:46.999440",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-07T10:00:42.647615",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-08T09:26:23.238571",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-09T09:27:41.923370",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-10T09:26:42.095487",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-11T09:25:20.879285",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-12T09:05:55.148619",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-13T12:56:10.696353",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-14T14:33:54.694681",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T10:10:36.829682",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 0.98
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 0.98
+        }
+      ],
+      "is_discount": false
+    },
+    "synka": {
+      "name": "Synka",
+      "history": [
+        {
+          "timestamp": "2026-08-16T05:31:08.041476",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-17T05:37:38.570951",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-18T05:32:54.255187",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-19T05:33:49.021056",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-20T05:34:07.377906",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-21T05:35:31.544484",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-22T05:30:28.086685",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-23T05:32:19.807388",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-24T05:40:35.173877",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-25T05:34:15.182881",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-26T05:37:02.958346",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-27T16:14:16.617889",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-28T17:12:55.526640",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-29T11:31:12.440962",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-30T10:22:13.731502",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-08-31T11:27:14.754247",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-01T09:49:38.770967",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-02T09:22:36.707089",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-03T09:31:36.813419",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-04T09:23:46.999440",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-05T08:52:54.080146",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-06T09:13:03.986769",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-07T10:00:42.647615",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-08T09:26:23.238571",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-09T09:27:41.923370",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-10T09:26:42.095487",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-11T09:25:20.879285",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-12T09:05:55.148619",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-13T12:56:10.696353",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-14T14:33:54.694681",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T10:10:36.829682",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T13:17:35.807847",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T13:17:55.601147",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T13:50:30.979625",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T13:53:46.679622",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T14:26:46.995871",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T14:39:57.491183",
+          "price": 1.15
+        },
+        {
+          "timestamp": "2026-09-15T14:43:28.903833",
+          "price": 1.15
+        }
+      ],
+      "is_discount": false
     }
   }
 }

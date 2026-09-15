@@ -9,7 +9,9 @@ import {
   MarketinIcon,
   KritikosIcon,
   BazaarIcon,
-  Store24hstoresIcon
+  Store24hstoresIcon,
+  HalkiadakisIcon,
+  SynkaIcon
 } from './icons';
 
 interface StoreIconProps {
@@ -28,6 +30,8 @@ export function StoreIcon({ storeId, className, size = 24 }: StoreIconProps) {
     case 'marketin': return <MarketinIcon size={size} className={className} />;
     case 'kritikos': return <KritikosIcon size={size} className={className} />;
     case 'bazaar': return <BazaarIcon size={size} className={className} />;
+    case 'halkiadakis': return <HalkiadakisIcon size={size} className={className} />;
+    case 'synka': return <SynkaIcon size={size} className={className} />;
     case '24hr': return <Store24hstoresIcon size={size} className={className} />;
     default: return <Storefront size={size} className={className} weight="duotone" />;
   }

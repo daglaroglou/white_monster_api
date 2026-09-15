@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
-import { Storefront, Clock, MapPin, Moon, Sun } from '@phosphor-icons/react';
+import { Storefront, Clock, MapPin, Moon, Sun, Tag } from '@phosphor-icons/react';
 import dynamic from 'next/dynamic';
 const Scene = dynamic(() => import('@/components/Scene'), { ssr: false });
 import { ApiDocs } from '@/components/ApiDocs';
@@ -16,6 +16,7 @@ interface StoreData {
   name: string;
   price: number | null;
   available: boolean;
+  is_discount?: boolean;
   history?: { timestamp: string; price: number }[];
 }
 
@@ -23,6 +24,7 @@ interface PriceData {
   last_updated: string;
   product: string;
   currency: string;
+  description?: string;
   stores: Record<string, StoreData>;
   total?: { name: string; history: { timestamp: string; price: number }[] };
 }
@@ -282,6 +284,20 @@ export default function Home() {
 
   return (
     <div className={styles.layout}>
+      {data?.description && (
+        <>
+          <div className={styles.marqueeContainerLeft}>
+            <div className={styles.marqueeTextVertical} suppressHydrationWarning>
+              {data.description} &bull; {data.description} &bull; {data.description} &bull; 
+            </div>
+          </div>
+          <div className={styles.marqueeContainerRight}>
+            <div className={styles.marqueeTextVertical} suppressHydrationWarning>
+              {data.description} &bull; {data.description} &bull; {data.description} &bull; 
+            </div>
+          </div>
+        </>
+      )}
       <LoadingScreen />
       <ThemeToggle />
       <div className={styles.bentoGrid}>
@@ -381,8 +397,10 @@ export default function Home() {
             kritikos: 'https://kritikos-sm.gr',
             mymarket: 'https://www.mymarket.gr',
             galaxias: 'https://galaxias.shop',
+            halkiadakis: 'https://www.xalkiadakis.gr',
             bazaar: 'https://www.bazaar-online.gr',
             marketin: 'https://www.market-in.gr',
+            synka: 'https://synka-sm.gr',
             "24hr": 'https://www.24hr.gr'
           };
 
@@ -442,6 +460,7 @@ export default function Home() {
 
               <div className={`${styles.storePrice} ${!available ? styles.unavailable : ''}`}>
                 {available ? `€${price?.toFixed(2)}` : 'N/A'}
+                {store.is_discount && <Tag className={styles.discountTag} weight="duotone" />}
               </div>
             </motion.div>
           );

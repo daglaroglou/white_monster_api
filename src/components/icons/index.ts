@@ -7,3 +7,5 @@ export * from './MarketinIcon';
 export * from './MasoutisIcon';
 export * from './MymarketIcon';
 export * from './SklavenitisIcon';
+export * from './HalkiadakisIcon';
+export * from './SynkaIcon';
