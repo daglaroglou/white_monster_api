@@ -485,7 +485,7 @@ export default function Home() {
         <div className={styles.footerRight}>
           <NextUpdateCountdown />
           <span className={styles.commitSha}>
-            commit {process.env.NEXT_PUBLIC_COMMIT_SHA || 'dev'}
+            commit {process.env.NEXT_PUBLIC_COMMIT_SHA?.slice(0, 7) || 'dev'}
           </span>
         </div>
       </footer>
