@@ -3,7 +3,10 @@ import { execSync } from "child_process";
 
 let commitSha = "unknown";
 try {
-  commitSha = execSync('git rev-parse --short HEAD').toString().trim();
+  commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || process.env.GITHUB_SHA || execSync('git rev-parse --short HEAD').toString().trim();
+  if (commitSha.length > 7) {
+    commitSha = commitSha.substring(0, 7);
+  }
 } catch (e) {
   // Ignore
 }

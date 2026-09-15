@@ -479,6 +479,8 @@ export default function Home() {
           </a>
           <span className={styles.footerDot}>•</span>
           <span>Designed & Built by <a href="https://dag.is-a.dev" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex' }}>daglaroglou</a></span>
+          <span className={styles.footerDot}>•</span>
+          <a href="mailto:contact@dag.is-a.dev">contact@dag.is-a.dev</a>
         </div>
         <div className={styles.footerRight}>
           <NextUpdateCountdown />
