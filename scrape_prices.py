@@ -309,16 +309,16 @@ async def _fetch_and_extract(page, url):
     if price is not None:
         return price
         
-    print(f"Playwright returned None for {url}, falling back to requests...")
+    print(f"Playwright returned None for {url}, falling back to advanced impersonation...")
     try:
-        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+        from curl_cffi import requests as curl_requests
         resp = await asyncio.to_thread(
-            requests.get, url, headers={"User-Agent": user_agent, "Accept-Language": "el-GR,el;q=0.9,en;q=0.8"}, timeout=30
+            curl_requests.get, url, impersonate="chrome110", timeout=30
         )
         if resp.status_code == 200:
             return robust_price_extract(resp.text)
     except Exception as e:
-        print(f"Requests fallback failed for {url}: {e}")
+        print(f"Fallback failed for {url}: {e}")
         
     return None
 
