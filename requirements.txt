@@ -1,3 +1,4 @@
-beautifulsoup4==4.14.3
-playwright==1.60.0
-requests==2.32.3
+beautifulsoup4
+playwright
+requests
+fake-useragent

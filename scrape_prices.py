@@ -209,55 +209,111 @@ def update_price_history(prices):
 
 # Scraping Handlers
 
-async def fetch_api_prices():
-    url = "https://api.posokanei.gov.gr/products/92482dbc21c54e08b76320730929c0a9"
+def robust_price_extract(html):
+    soup = BeautifulSoup(html, "html.parser")
+    
+    semantic_prices = []
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(script.string)
+            if isinstance(data, dict): data = [data]
+            for item in data:
+                if isinstance(item, dict):
+                    if item.get("@type") == "Product" or item.get("@type") == "ItemPage":
+                        offers = item.get("offers", {})
+                        if isinstance(offers, list): offers = offers[0] if offers else {}
+                        if "price" in offers:
+                            try: semantic_prices.append(float(offers["price"]))
+                            except: pass
+        except: pass
+
+    meta_price = soup.find("meta", property="product:price:amount")
+    if meta_price and meta_price.get("content"):
+        try: semantic_prices.append(float(meta_price["content"]))
+        except: pass
+            
+    for el in soup.find_all(attrs={"itemprop": "price"}):
+        if el.get("content"):
+            try: semantic_prices.append(float(el["content"]))
+            except: pass
+        text = el.get_text(strip=True)
+        if text:
+            parsed = parse_price_to_float(text)
+            if parsed is not None: semantic_prices.append(parsed)
+
+    valid_semantic = [p for p in semantic_prices if 0.8 <= p <= 2.0]
+    if valid_semantic:
+        return min(valid_semantic)
+
+    text = soup.get_text(separator=" ", strip=True)
+    matches = re.findall(r'(\d+)[.,\s](\d{2})\s*€|€\s*(\d+)[.,\s](\d{2})', text)
+    
+    text_prices = []
+    for m1, m2, m3, m4 in matches:
+        if m1 and m2:
+            parsed = parse_price_to_float(f"{m1}.{m2}")
+        else:
+            parsed = parse_price_to_float(f"{m3}.{m4}")
+        if parsed is not None:
+            text_prices.append(parsed)
+            
+    for p in text_prices:
+        if 0.8 <= p <= 2.0:
+            return p
+            
+    for p in text_prices[:5]:
+        if 0.8 <= p <= 3.0:
+            return p
+            
+    return None
+
+async def _fetch_and_extract(page, url):
     try:
-        import requests
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        response = await asyncio.to_thread(requests.get, url, headers=headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        api_mapping = {
-            "ab_vasilopoulos": ("ab", "AB Vassilopoulos"),
-            "galaxias": ("galaxias", "Galaxias"),
-            "halkiadakis": ("halkiadakis", "Halkiadakis"),
-            "kritikos": ("kritikos", "Kritikos"),
-            "market_in": ("marketin", "Market In"),
-            "masoutis": ("masoutis", "Masoutis"),
-            "mymarket": ("mymarket", "MyMarket"),
-            "sklavenitis": ("sklavenitis", "Sklavenitis"),
-            "bazaar": ("bazaar", "Bazaar"),
-            "synka": ("synka", "Synka"),
-        }
-        
-        extracted = {}
-        for item in data.get("retailer_prices", []):
-            ret = item.get("retailer")
-            if ret in api_mapping:
-                store_id, store_name = api_mapping[ret]
-                extracted[store_id] = {
-                    "name": store_name,
-                    "price": item.get("price"),
-                    "available": item.get("price") is not None,
-                    "is_discount": item.get("is_discount", False)
-                }
-        return extracted, data.get("description", "")
+        await page.goto(url, wait_until="domcontentloaded", timeout=45000)
+        try:
+            await page.wait_for_timeout(5000)
+        except: pass
+        html = await page.content()
+        return robust_price_extract(html)
     except Exception as e:
-        print(f"Error fetching API prices: {e}")
-        return {}, ""
+        print(f"Error fetching {url}: {e}")
+        return None
+
+async def ab_vasilopoulos(page):
+    url = "https://www.ab.gr/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsyktika/Energeiaka-Isotonika/Energeiako-Poto-Energy-Ultra-500ml/p/7289419"
+    return await _fetch_and_extract(page, url)
+
+async def galaxias(page):
+    url = "https://galaxias.shop/product/5060337501125"
+    return await _fetch_and_extract(page, url)
+
+async def halkiadakis(page):
+    url = "https://xalkiadakis.gr/product/monster-energy-energheiako-poto-ultra-xoris-zakhari-500-ml"
+    return await _fetch_and_extract(page, url)
+
+async def kritikos(page):
+    url = "https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"
+    return await _fetch_and_extract(page, url)
+
+async def market_in(page):
+    url = "https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"
+    return await _fetch_and_extract(page, url)
+
+async def masoutis(page):
+    url = "https://www.masoutis.gr/categories/item/monster-energy-drink-ultra-zero-500ml?3205614="
+    return await _fetch_and_extract(page, url)
+
+async def mymarket(page):
+    url = "https://www.mymarket.gr/monster-energy-zero-ultra-500gr"
+    return await _fetch_and_extract(page, url)
+
+async def sklavenitis(page):
+    url = "https://www.sklavenitis.gr/anapsyktika-nera-chymoi/energeiaka-pota-ice-tea-ice-coffee/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"
+    return await _fetch_and_extract(page, url)
 
 async def bazaar(page):
-    url = "https://www.bazaar-online.gr/monster-500ml-energy-zero-ultra?search=monster"
-    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-    el = page.locator(".new_price").first
-    try:
-        await el.wait_for(state="attached", timeout=15000)
-        text = await el.evaluate("el => el.textContent")
-        return parse_price_to_float(text)
-    except Exception:
-        pass
-    return None
+    url = "https://www.bazaar-online.gr/monster-energeiako-poto-zero-ultra-500ml"
+    return await _fetch_and_extract(page, url)
 
 async def hr24(page=None):
     url = "https://www.24hr.gr/el/%CF%80%CF%81%CE%BF%CF%8A%CF%8C%CE%BD%CF%84%CE%B1/energy/energy/monster-energy-%CE%B5%CE%BD%CE%B5%CF%81%CE%B3%CE%B5%CE%B9%CE%B1%CE%BA%CF%8C-%CF%80%CE%BF%CF%84%CF%8C-ultra-white-zero-sugar-500ml"
@@ -265,10 +321,20 @@ async def hr24(page=None):
         import requests
         from bs4 import BeautifulSoup
         import asyncio
+        try:
+            from fake_useragent import UserAgent
+            user_agent = UserAgent().chrome
+        except ImportError:
+            user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+            
         response = await asyncio.to_thread(
-            requests.get, url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}, timeout=30
+            requests.get, url, headers={"User-Agent": user_agent}, timeout=30
         )
         response.raise_for_status()
+        price = robust_price_extract(response.text)
+        if price is not None:
+            return price
+            
         soup = BeautifulSoup(response.text, "html.parser")
         price_element = soup.select_one("#das-product-details-price, .das-product-details-price-value")
         if price_element:
@@ -295,50 +361,61 @@ async def main_async():
     import asyncio
     from playwright.async_api import async_playwright
     
-    # Fetch from new API
-    api_task = asyncio.create_task(fetch_api_prices())
+    try:
+        from fake_useragent import UserAgent
+        user_agent = UserAgent().chrome
+    except ImportError:
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
     
-    # Fetch Bazaar using Playwright
-    async def fetch_bazaar():
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context()
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(user_agent=user_agent)
+        
+        async def scrape_with_page(func):
+            page = await context.new_page()
             try:
-                page = await context.new_page()
-                bazaar_price = await bazaar(page)
-                return bazaar_price
-            except Exception as e:
-                print(f"Error fetching Bazaar price: {e}")
-                return None
+                return await func(page)
             finally:
-                await browser.close()
+                await page.close()
                 
-    bazaar_task = asyncio.create_task(fetch_bazaar())
-    hr24_task = asyncio.create_task(hr24())
-    (api_prices, description), bazaar_price, hr24_price = await asyncio.gather(api_task, bazaar_task, hr24_task)
-    
-    # Add description to root of prices dict
-    if description:
-        prices["description"] = description
-    
-    # Combine results
-    prices["stores"].update(api_prices)
-    
-    # Keep the API's discount status for Bazaar if it exists
-    bazaar_discount = prices["stores"].get("bazaar", {}).get("is_discount", False)
-    prices["stores"]["bazaar"] = {
-        "name": "Bazaar",
-        "price": bazaar_price,
-        "available": bazaar_price is not None,
-        "is_discount": bazaar_discount
-    }
-    
-    prices["stores"]["24hr"] = {
-        "name": "24hr Stores",
-        "price": hr24_price,
-        "available": hr24_price is not None,
-        "is_discount": False
-    }
+        tasks = {
+            "ab_vasilopoulos": asyncio.create_task(scrape_with_page(ab_vasilopoulos)),
+            "galaxias": asyncio.create_task(scrape_with_page(galaxias)),
+            "halkiadakis": asyncio.create_task(scrape_with_page(halkiadakis)),
+            "kritikos": asyncio.create_task(scrape_with_page(kritikos)),
+            "market_in": asyncio.create_task(scrape_with_page(market_in)),
+            "masoutis": asyncio.create_task(scrape_with_page(masoutis)),
+            "mymarket": asyncio.create_task(scrape_with_page(mymarket)),
+            "sklavenitis": asyncio.create_task(scrape_with_page(sklavenitis)),
+            "bazaar": asyncio.create_task(scrape_with_page(bazaar)),
+            "24hr": asyncio.create_task(hr24())
+        }
+        
+        results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+        
+        names = {
+            "ab_vasilopoulos": "AB Vassilopoulos",
+            "galaxias": "Galaxias",
+            "halkiadakis": "Halkiadakis",
+            "kritikos": "Kritikos",
+            "market_in": "Market In",
+            "masoutis": "Masoutis",
+            "mymarket": "MyMarket",
+            "sklavenitis": "Sklavenitis",
+            "bazaar": "Bazaar",
+            "24hr": "24hr Stores"
+        }
+        
+        for key, result in zip(tasks.keys(), results):
+            price = result if not isinstance(result, Exception) else None
+            prices["stores"][key] = {
+                "name": names[key],
+                "price": price,
+                "available": price is not None,
+                "is_discount": False
+            }
+            
+        await browser.close()
     
     # Print results to stdout for logging
     for s_id, s_data in prices["stores"].items():
