@@ -2,3 +2,4 @@ beautifulsoup4
 playwright
 requests
 curl_cffi
+playwright-stealth

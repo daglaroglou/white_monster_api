@@ -288,6 +288,12 @@ def robust_price_extract(html):
 async def _fetch_and_extract(page, url):
     price = None
     try:
+        try:
+            from playwright_stealth import stealth_async
+            await stealth_async(page)
+        except ImportError:
+            pass
+            
         await page.goto(url, wait_until="domcontentloaded", timeout=45000)
         try:
             await page.wait_for_timeout(5000)
@@ -313,7 +319,7 @@ async def _fetch_and_extract(page, url):
     try:
         from curl_cffi import requests as curl_requests
         resp = await asyncio.to_thread(
-            curl_requests.get, url, impersonate="chrome110", timeout=30
+            curl_requests.get, url, impersonate="chrome124", timeout=30
         )
         if resp.status_code == 200:
             return robust_price_extract(resp.text)
