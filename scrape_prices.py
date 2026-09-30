@@ -321,11 +321,7 @@ async def hr24(page=None):
         import requests
         from bs4 import BeautifulSoup
         import asyncio
-        try:
-            from fake_useragent import UserAgent
-            user_agent = UserAgent().chrome
-        except ImportError:
-            user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
             
         response = await asyncio.to_thread(
             requests.get, url, headers={"User-Agent": user_agent}, timeout=30
@@ -361,11 +357,7 @@ async def main_async():
     import asyncio
     from playwright.async_api import async_playwright
     
-    try:
-        from fake_useragent import UserAgent
-        user_agent = UserAgent().chrome
-    except ImportError:
-        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
