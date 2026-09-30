@@ -213,6 +213,15 @@ def robust_price_extract(html):
     soup = BeautifulSoup(html, "html.parser")
     
     semantic_prices = []
+    
+    next_data = soup.find("script", id="__NEXT_DATA__")
+    if next_data and next_data.string:
+        try:
+            prices = re.findall(r'"price"\s*:\s*(\d+\.\d{2})', next_data.string)
+            for p in prices:
+                semantic_prices.append(float(p))
+        except: pass
+        
     for script in soup.find_all("script", type="application/ld+json"):
         try:
             data = json.loads(script.string)
@@ -265,19 +274,53 @@ def robust_price_extract(html):
         if 0.8 <= p <= 3.0:
             return p
             
+    # As a final fallback for scripts with dynamic json states
+    try:
+        prices = re.findall(r'"price"\s*:\s*(\d+\.\d{2})', html)
+        if prices:
+            for p in prices:
+                parsed = float(p)
+                if 0.8 <= parsed <= 3.0: return parsed
+    except: pass
+            
     return None
 
 async def _fetch_and_extract(page, url):
+    price = None
     try:
         await page.goto(url, wait_until="domcontentloaded", timeout=45000)
         try:
             await page.wait_for_timeout(5000)
         except: pass
-        html = await page.content()
-        return robust_price_extract(html)
+        
+        try:
+            html = await page.content()
+        except Exception as content_e:
+            if "navigating" in str(content_e).lower():
+                await page.wait_for_timeout(3000)
+                html = await page.content()
+            else:
+                raise content_e
+                
+        price = robust_price_extract(html)
     except Exception as e:
-        print(f"Error fetching {url}: {e}")
-        return None
+        print(f"Error fetching {url} with Playwright: {e}")
+        
+    if price is not None:
+        return price
+        
+    print(f"Playwright returned None for {url}, falling back to requests...")
+    try:
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+        resp = await asyncio.to_thread(
+            requests.get, url, headers={"User-Agent": user_agent, "Accept-Language": "el-GR,el;q=0.9,en;q=0.8"}, timeout=30
+        )
+        if resp.status_code == 200:
+            return robust_price_extract(resp.text)
+    except Exception as e:
+        print(f"Requests fallback failed for {url}: {e}")
+        
+    return None
 
 async def ab_vasilopoulos(page):
     url = "https://www.ab.gr/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsyktika/Energeiaka-Isotonika/Energeiako-Poto-Energy-Ultra-500ml/p/7289419"
