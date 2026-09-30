@@ -218,7 +218,6 @@ def robust_price_extract(html):
     next_data = soup.find("script", id="__NEXT_DATA__")
     if next_data and next_data.string:
         try:
-            import re
             prices = re.findall(r'"price"\s*:\s*(\d+\.\d{2})', next_data.string)
             for p in prices:
                 semantic_prices.append(float(p))
@@ -294,8 +293,6 @@ async def _fetch_and_extract(page, url):
         return price
         
     print(f"Playwright returned None for {url}, falling back to requests...")
-    import requests
-    import asyncio
     try:
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
         resp = await asyncio.to_thread(
