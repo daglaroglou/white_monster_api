@@ -7,7 +7,7 @@ on:
 
 jobs:
   scrape-and-update:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     
@@ -28,6 +28,18 @@ jobs:
     - name: Install dependencies
       run: uv pip install --system -r requirements.txt
 
+    - name: Install Cloudflare WARP
+      run: |
+        curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+        sudo apt-get update
+        sudo apt-get install -y cloudflare-warp
+        warp-cli --accept-tos registration new
+        warp-cli --accept-tos mode warp
+        warp-cli --accept-tos connect
+        sleep 5
+        curl -s https://www.cloudflare.com/cdn-cgi/trace | grep warp=
+
     - name: Install Chromium for scraping
       run: python -m playwright install chromium
 
@@ -35,13 +47,12 @@ jobs:
       run: python scrape_prices.py
     
     - name: Commit and push if changes
-      shell: pwsh
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add prices.json price_history.json
-        if (-not (git diff --staged --quiet)) {
-          $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss UTC")
+        if ! git diff --staged --quiet; then
+          timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           git commit -m "Update prices - $timestamp"
           git push
-        }
+        fi
