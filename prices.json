@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-07T09:55:52.937434",
+  "last_updated": "2026-10-08T10:07:37.768907",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
@@ -23,8 +23,8 @@
     },
     "kritikos": {
       "name": "Kritikos",
-      "price": null,
-      "available": false,
+      "price": 1.14,
+      "available": true,
       "is_discount": false
     },
     "market_in": {
