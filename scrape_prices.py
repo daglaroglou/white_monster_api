@@ -357,8 +357,15 @@ async def mymarket(page):
     return await _fetch_and_extract(page, url)
 
 async def sklavenitis(page):
-    url = "https://www.sklavenitis.gr/anapsyktika-nera-chymoi/energeiaka-pota-ice-tea-ice-coffee/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"
-    return await _fetch_and_extract(page, url)
+    urls = [
+        "https://www.sklavenitis.gr/anapsyktika-nera-chymoi/energeiaka-pota-ice-tea-ice-coffee/energeiaka-isotonika-pota/monster-energy-zero-ultra-energeiako-poto-500ml/",
+        "https://www.sklavenitis.gr/anapsyktika-nera-chymoi/energeiaka-isotonika-pota-ice-tea-ice-coffee/energeiaka-pota/monster-energy-zero-ultra-energeiako-poto-500ml/"
+    ]
+    for url in urls:
+        price = await _fetch_and_extract(page, url)
+        if price is not None:
+            return price
+    return None
 
 async def bazaar(page):
     url = "https://www.bazaar-online.gr/monster-energeiako-poto-zero-ultra-500ml"
