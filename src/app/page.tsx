@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 import { Storefront, Clock, MapPin, Moon, Sun, Tag, Heart } from '@phosphor-icons/react';
 import dynamic from 'next/dynamic';
@@ -32,7 +32,12 @@ interface PriceData {
 
 const data = priceDataRaw as unknown as PriceData;
 
-const spring = { type: 'spring' as const, bounce: 0, duration: 0.7 };
+const springTransition = {
+  type: 'spring' as const,
+  damping: 26,
+  stiffness: 280,
+  mass: 0.8
+};
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -49,7 +54,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 function ThemeToggle() {
   const [isDark, setIsDark] = useState<boolean | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [bubbles, setBubbles] = useState<{ id: number, x: number, delay: number, duration: number, size: number, color: string }[]>([]);
+  const [bubbles, setBubbles] = useState<{ id: number; x: number; endX: number; delay: number; duration: number; size: number; scale: number; color: string }[]>([]);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
@@ -75,37 +80,46 @@ function ThemeToggle() {
     const newBubbles = [];
 
     // Wave 1: Little amount (teaser fizz)
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 12; i++) {
+      const x = Math.random() * 100;
       newBubbles.push({
-        id: Date.now() + i,
-        x: Math.random() * 100,
-        delay: Math.random() * 0.2,
-        duration: 0.7 + Math.random() * 0.3,
-        size: Math.random() * 30 + 10, // pixels
+        id: i,
+        x,
+        endX: x + (Math.random() * 10 - 5),
+        delay: Math.random() * 0.18,
+        duration: 0.75 + Math.random() * 0.25,
+        size: Math.random() * 30 + 15,
+        scale: 2.5,
         color: targetColor
       });
     }
 
     // Wave 2: Medium amount
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 24; i++) {
+      const x = Math.random() * 100;
       newBubbles.push({
-        id: Date.now() + 100 + i,
-        x: Math.random() * 100,
-        delay: 0.2 + Math.random() * 0.2,
-        duration: 0.7 + Math.random() * 0.3,
-        size: Math.random() * 60 + 30, // pixels
+        id: 12 + i,
+        x,
+        endX: x + (Math.random() * 10 - 5),
+        delay: 0.18 + Math.random() * 0.18,
+        duration: 0.75 + Math.random() * 0.25,
+        size: Math.random() * 60 + 35,
+        scale: 3,
         color: targetColor
       });
     }
 
     // Wave 3: Massive amount to cover full density
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 44; i++) {
+      const x = Math.random() * 100;
       newBubbles.push({
-        id: Date.now() + 300 + i,
-        x: Math.random() * 100,
-        delay: 0.4 + Math.random() * 0.2,
-        duration: 0.8 + Math.random() * 0.3,
-        size: Math.random() * 150 + 100, // Huge pixels to completely paint screen
+        id: 36 + i,
+        x,
+        endX: x + (Math.random() * 10 - 5),
+        delay: 0.35 + Math.random() * 0.2,
+        duration: 0.8 + Math.random() * 0.25,
+        size: Math.random() * 180 + 120, // Huge bubbles
+        scale: 3.5, // 3.5x expansion ensures 100% viewport coverage
         color: targetColor
       });
     }
@@ -115,37 +129,37 @@ function ThemeToggle() {
     // Swap the theme while they are fully on screen and covering it
     setTimeout(() => {
       setIsDark(!isDark);
-    }, 800);
+    }, 780);
 
     // Clear out bubbles after they pass
     setTimeout(() => {
       setBubbles([]);
       setIsAnimating(false);
-    }, 1600);
+    }, 1500);
   };
 
   return (
     <>
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
-        <AnimatePresence>
+      {bubbles.length > 0 && (
+        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
           {bubbles.map(b => (
-            <motion.div
+            <div
               key={b.id}
-              initial={{ y: '120vh', x: `${b.x}vw`, scale: 0.5, opacity: 1 }}
-              animate={{ y: '-50vh', x: `${b.x + (Math.random() * 10 - 5)}vw`, scale: 3, opacity: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              transition={{ duration: b.duration, delay: b.delay, ease: "easeIn" }}
+              className={styles.screenWipeBubble}
               style={{
-                position: 'absolute',
+                left: `${b.x}vw`,
                 width: `${b.size}px`,
                 height: `${b.size}px`,
-                borderRadius: '50%',
                 backgroundColor: b.color,
-              }}
+                '--end-x': `${b.endX - b.x}vw`,
+                '--scale': b.scale,
+                animationDuration: `${b.duration}s`,
+                animationDelay: `${b.delay}s`,
+              } as React.CSSProperties}
             />
           ))}
-        </AnimatePresence>
-      </div>
+        </div>
+      )}
 
       <motion.button
         onClick={toggle}
@@ -168,6 +182,7 @@ function ThemeToggle() {
           zIndex: 10000,
           boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
         }}
+        aria-label="Toggle theme"
       >
         {isDark ? <Sun size={24} weight="fill" /> : <Moon size={24} weight="fill" />}
       </motion.button>
@@ -190,8 +205,6 @@ function NextUpdateCountdown() {
     const calculateTimeLeft = () => {
       const now = new Date();
 
-      // The update runs at 8:00 AM UTC. 
-      // We give it a 5-minute window to scrape, commit, and deploy.
       if (now.getUTCHours() === 8 && now.getUTCMinutes() < 5) {
         setIsRefreshing(true);
         return '';
@@ -200,10 +213,9 @@ function NextUpdateCountdown() {
       setIsRefreshing(false);
 
       const nextUpdate = new Date();
-      nextUpdate.setUTCHours(8, 0, 0, 0); // Updates run at 8:00 AM UTC (11 AM Greek Summer Time)
+      nextUpdate.setUTCHours(8, 0, 0, 0);
 
       if (now > nextUpdate) {
-        // If it's already past 8 AM UTC today, next update is tomorrow
         nextUpdate.setUTCDate(nextUpdate.getUTCDate() + 1);
       }
 
@@ -248,9 +260,7 @@ export default function Home() {
   const [isDonateOpen, setIsDonateOpen] = useState(false);
 
   const formatTimestamp = (isoTs: string) => {
-    // Basic manual formatting to prevent hydration mismatch
     const dt = new Date(isoTs);
-    // Approximate Europe/Athens (UTC+2 or UTC+3). For safety, we just use UTC for UI consistency across clients
     const day = dt.getUTCDate().toString().padStart(2, '0');
     const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getUTCMonth()];
     const hours = dt.getUTCHours().toString().padStart(2, '0');
@@ -284,6 +294,26 @@ export default function Home() {
     }
   }
 
+  // Calculate live market intelligence stats
+  const activeStores = Object.entries(data?.stores || {}).filter(([_, s]) => {
+    const latest = s.history && s.history.length > 0 ? s.history[s.history.length - 1] : null;
+    return latest && latest.price !== null;
+  });
+
+  const activePrices = activeStores.map(([_, s]) => {
+    const latest = s.history![s.history!.length - 1];
+    return latest.price;
+  });
+
+  const lowestPrice = activePrices.length ? Math.min(...activePrices) : null;
+  const lowestPriceStores = activeStores
+    .filter(([_, s]) => s.history![s.history!.length - 1].price === lowestPrice)
+    .map(([_, s]) => s.name);
+
+  const currentAverage = activePrices.length
+    ? Number((activePrices.reduce((a, b) => a + b, 0) / activePrices.length).toFixed(2))
+    : null;
+
   return (
     <div className={styles.layout}>
       {data?.description && (
@@ -307,30 +337,66 @@ export default function Home() {
         {/* HERO CELL */}
         <motion.div
           className={`${styles.bentoCell} ${styles.heroCell}`}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...spring, delay: 0.1 }}
+          transition={{ ...springTransition, delay: 0.05 }}
         >
           <div className={styles.eyebrow} suppressHydrationWarning>
-            <Clock size={14} weight="bold" />
-            Updated {data?.last_updated ? formatTimestamp(data.last_updated) : 'Unknown'}
+            <span className={styles.liveIndicator}>
+              <span className={styles.liveDot} />
+              <span className={styles.livePing} />
+            </span>
+            <span className={styles.liveText}>Live Tracker</span>
+            <span className={styles.dotSeparator}>•</span>
+            <Clock size={13} weight="bold" />
+            <span>Updated {data?.last_updated ? formatTimestamp(data.last_updated) : 'Unknown'}</span>
           </div>
+
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>Market<br />Pricing.</h1>
           </div>
           <p className={styles.subtext}>
-            Live pricing data for Monster Energy Ultra Zero across major Greek retailers.
+            Real-time price intelligence for Monster Energy Ultra Zero 500ml across major Greek retail chains.
           </p>
+
+          <div className={styles.heroStats}>
+            <div className={styles.heroStatItem}>
+              <span className={styles.heroStatLabel}>Lowest Price</span>
+              <span className={styles.heroStatValue}>
+                {lowestPrice !== null ? `€${lowestPrice.toFixed(2)}` : 'N/A'}
+              </span>
+              {lowestPriceStores.length > 0 && (
+                <span className={styles.heroStatSub}>
+                  {lowestPriceStores.slice(0, 2).join(', ')}
+                </span>
+              )}
+            </div>
+            <div className={styles.heroStatDivider} />
+            <div className={styles.heroStatItem}>
+              <span className={styles.heroStatLabel}>Market Avg</span>
+              <span className={styles.heroStatValue}>
+                {currentAverage !== null ? `€${currentAverage.toFixed(2)}` : 'N/A'}
+              </span>
+              <span className={styles.heroStatSub}>Active stores</span>
+            </div>
+            <div className={styles.heroStatDivider} />
+            <div className={styles.heroStatItem}>
+              <span className={styles.heroStatLabel}>Retailers</span>
+              <span className={styles.heroStatValue}>
+                {activeStores.length}
+              </span>
+              <span className={styles.heroStatSub}>Tracked live</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* 3D SCENE CELL */}
         <motion.div
           className={`${styles.bentoCell} ${styles.sceneCell}`}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...spring, delay: 0.2 }}
+          transition={{ ...springTransition, delay: 0.1 }}
         >
-          {/* Subtle radial background to give depth without harsh borders */}
           <div className={styles.sceneBgLight} />
           <div className={styles.sceneBgDark} />
           <div className={styles.sceneWrapper}>
@@ -341,9 +407,9 @@ export default function Home() {
         {/* CHART CELL */}
         <motion.div
           className={`${styles.bentoCell} ${styles.chartCell}`}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...spring, delay: 0.3 }}
+          transition={{ ...springTransition, delay: 0.15 }}
         >
           <div className={styles.chartHeader}>
             <h2 className={styles.chartTitle}>30-Day Average</h2>
@@ -351,7 +417,13 @@ export default function Home() {
           </div>
           <div className={styles.chartContainer}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 20 }}>
+              <AreaChart data={chartData} margin={{ top: 15, right: 8, left: -15, bottom: 10 }}>
+                <defs>
+                  <linearGradient id="mainChartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--text-primary)" stopOpacity={0.14} />
+                    <stop offset="95%" stopColor="var(--text-primary)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <XAxis
                   dataKey="date"
                   stroke="var(--border-strong)"
@@ -372,17 +444,16 @@ export default function Home() {
                   axisLine={{ stroke: 'var(--border-strong)', strokeWidth: 1 }}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border-strong)', strokeWidth: 1 }} />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="price"
                   stroke="var(--text-primary)"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
+                  fill="url(#mainChartGradient)"
                   dot={false}
-                  activeDot={{ r: 6, fill: 'var(--text-primary)', stroke: 'var(--card-bg)', strokeWidth: 2 }}
-                  animationDuration={1500}
-                  animationEasing="ease-out"
+                  activeDot={{ r: 5, fill: 'var(--text-primary)', stroke: 'var(--card-bg)', strokeWidth: 2.5 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
@@ -409,6 +480,7 @@ export default function Home() {
           const latestRecord = store.history && store.history.length > 0 ? store.history[store.history.length - 1] : null;
           const price = latestRecord ? latestRecord.price : null;
           const available = price !== null;
+          const isLowest = price !== null && lowestPrice !== null && price === lowestPrice;
 
           const storeChartData = (store.history || []).map(pt => ({
             time: formatTimestamp(pt.timestamp),
@@ -426,9 +498,9 @@ export default function Home() {
             <motion.div
               key={key}
               className={`${styles.bentoCell} ${styles.storeCell}`}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ ...spring, delay: 0.4 + (idx * 0.1) }}
+              transition={{ ...springTransition, delay: 0.12 + (idx * 0.035) }}
             >
               <div className={styles.storeHeader}>
                 <div className={styles.storeName}>
@@ -439,30 +511,42 @@ export default function Home() {
                 <StoreIcon storeId={key} size={32} className={styles.storeLogo} />
               </div>
 
-              {storeChartData.length > 1 && (
+              {storeChartData.length > 1 ? (
                 <div className={styles.storeChartContainer}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={storeChartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+                    <AreaChart data={storeChartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id={`sparkline-${key}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--text-primary)" stopOpacity={0.14} />
+                          <stop offset="100%" stopColor="var(--text-primary)" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
                       <YAxis domain={[minT, maxT]} hide={true} />
                       <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border-strong)', strokeWidth: 1 }} />
-                      <Line
+                      <Area
                         type="monotone"
                         dataKey="price"
                         stroke="var(--text-primary)"
-                        strokeWidth={2}
+                        strokeWidth={1.8}
+                        fill={`url(#sparkline-${key})`}
                         dot={false}
                         activeDot={{ r: 4, fill: 'var(--text-primary)', stroke: 'var(--card-bg)', strokeWidth: 2 }}
-                        animationDuration={1500}
-                        animationEasing="ease-out"
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className={styles.storeChartPlaceholder}>
+                  <span>No historical trend</span>
                 </div>
               )}
 
-              <div className={`${styles.storePrice} ${!available ? styles.unavailable : ''}`}>
-                {available ? `€${price?.toFixed(2)}` : 'N/A'}
-                {store.is_discount && <Tag className={styles.discountTag} weight="duotone" />}
+              <div className={styles.priceRow}>
+                <div className={`${styles.storePrice} ${!available ? styles.unavailable : ''}`}>
+                  {available ? `€${price?.toFixed(2)}` : 'N/A'}
+                  {store.is_discount && <Tag className={styles.discountTag} weight="duotone" />}
+                </div>
+                {isLowest && <span className={styles.lowestPricePill}>Lowest</span>}
               </div>
             </motion.div>
           );

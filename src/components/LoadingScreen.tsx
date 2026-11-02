@@ -22,8 +22,7 @@ export function LoadingScreen() {
   useEffect(() => {
     const handleSceneRendered = () => {
       setDisplayProgress(100);
-      // Give it a brief moment to show 100% before fading out
-      setTimeout(() => setIsLoaded(true), 400);
+      setTimeout(() => setIsLoaded(true), 350);
     };
 
     window.addEventListener('scene-rendered', handleSceneRendered);
@@ -37,8 +36,8 @@ export function LoadingScreen() {
       {!isLoaded && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          exit={{ opacity: 0, scale: 1.02 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           style={{
             position: 'fixed',
             inset: 0,
@@ -48,11 +47,23 @@ export function LoadingScreen() {
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
+            backdropFilter: 'blur(20px)',
           }}
         >
-          <div style={{ position: 'relative', width: 100, height: 100 }}>
-            {/* Empty Silhouette (Background) */}
-            <div style={{ position: 'absolute', inset: 0, opacity: 0.15, filter: 'grayscale(100%)' }}>
+          <div style={{ position: 'relative', width: 110, height: 110 }}>
+            {/* Ambient Glow */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: -20,
+                background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
+                filter: 'blur(16px)',
+                pointerEvents: 'none'
+              }}
+            />
+
+            {/* Silhouette (Background) */}
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.12, filter: 'grayscale(100%)' }}>
               <Image
                 src="/white_monster_api/img/monster.png"
                 alt="Loading..."
@@ -62,11 +73,14 @@ export function LoadingScreen() {
               />
             </div>
             
-            {/* Filled Can (Liquid Fill Animation) */}
+            {/* Filled Can (Liquid Fill Animation tied to real progress) */}
             <motion.div
-              animate={{ clipPath: ['inset(100% 0 0 0)', 'inset(0% 0 0 0)', 'inset(100% 0 0 0)'] }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-              style={{ position: 'absolute', inset: 0 }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                clipPath: `inset(${100 - displayProgress}% 0 0 0)`,
+                transition: 'clip-path 0.3s ease-out'
+              }}
             >
               <Image
                 src="/white_monster_api/img/monster.png"
@@ -77,15 +91,40 @@ export function LoadingScreen() {
               />
             </motion.div>
           </div>
-          <div style={{
-            marginTop: 24,
-            fontFamily: 'var(--font-geist-mono)',
-            color: 'var(--text-secondary)',
-            fontSize: '14px',
-            fontWeight: 500,
-            letterSpacing: '0.05em'
-          }}>
-            {displayProgress}%
+
+          {/* Progress Bar & Counter */}
+          <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 120,
+                height: 3,
+                borderRadius: 3,
+                backgroundColor: 'var(--border-subtle)',
+                overflow: 'hidden',
+                position: 'relative'
+              }}
+            >
+              <motion.div
+                style={{
+                  height: '100%',
+                  width: `${displayProgress}%`,
+                  backgroundColor: 'var(--text-primary)',
+                  borderRadius: 3,
+                  transition: 'width 0.25s ease-out'
+                }}
+              />
+            </div>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                color: 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.08em'
+              }}
+            >
+              {displayProgress}%
+            </span>
           </div>
         </motion.div>
       )}

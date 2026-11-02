@@ -1,17 +1,31 @@
 .apiContainer {
   background: var(--card-bg);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  padding: 24px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   grid-column: 1 / -1;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  transition: background-color 0.2s ease 0.3s, border-color 0.2s ease 0.3s, color 0.2s ease 0.3s;
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
   min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 579px) {
+  .apiContainer {
+    padding: 20px;
+    border-radius: 20px;
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .apiContainer {
+    padding: 36px;
+  }
 }
 
 .apiHeader {
@@ -36,7 +50,7 @@
 }
 
 .apiTitle h2 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 600;
   margin: 0;
   letter-spacing: -0.02em;
@@ -51,7 +65,7 @@
   padding: 0.5rem 0.75rem;
   gap: 0.75rem;
   overflow: hidden;
-  transition: background-color 0.2s ease 0.3s, border-color 0.2s ease 0.3s;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   min-width: 0;
 }
 
@@ -61,8 +75,8 @@
 
 .url {
   color: var(--text-secondary);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.85rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.82rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -82,15 +96,16 @@
   border-radius: 4px;
   transition: all 0.2s ease;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .copyBtn:hover {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 :global(:root:not(.dark)) .copyBtn:hover {
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .apiContent {
@@ -104,9 +119,11 @@
 
 .tabs {
   display: flex;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid var(--border-strong);
-  transition: background-color 0.2s ease 0.3s, border-color 0.2s ease 0.3s;
+  position: relative;
+  padding: 4px 6px;
+  gap: 4px;
 }
 
 :global(:root:not(.dark)) .tabs {
@@ -114,15 +131,24 @@
 }
 
 .tabBtn {
+  position: relative;
   background: none;
   border: none;
   color: var(--text-secondary);
-  padding: 0.75rem 1.25rem;
-  font-size: 0.85rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .tabBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 
 .tabBtn:hover {
@@ -131,27 +157,42 @@
 
 .activeTab {
   color: var(--text-primary);
-  border-bottom-color: var(--text-primary);
+}
+
+.tabIndicator {
+  position: absolute;
+  inset: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: -1;
+  border: 1px solid var(--border-subtle);
 }
 
 .codeBlock {
   position: relative;
-  background: #0d0d0d;
-  padding: 1.25rem;
+  background: #0a0a0a;
+  padding: 1rem;
   overflow-x: auto;
-  transition: background-color 0.2s ease 0.3s;
+  transition: background-color 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .codeBlock {
+    padding: 1.25rem;
+  }
 }
 
 :global(:root:not(.dark)) .codeBlock {
-  background: #f8f9fa;
+  background: #fafafa;
 }
 
 .codeIcon {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  color: var(--text-muted);
-  opacity: 0.5;
+  top: 0.85rem;
+  right: 0.85rem;
+  color: var(--text-secondary);
+  opacity: 0.35;
 }
 
 .codeBlock pre {
@@ -160,10 +201,16 @@
 }
 
 .codeBlock code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
   color: #e2e8f0;
+}
+
+@media (min-width: 768px) {
+  .codeBlock code {
+    font-size: 0.85rem;
+  }
 }
 
 :global(:root:not(.dark)) .codeBlock code {
@@ -173,17 +220,17 @@
 /* Syntax Highlighting */
 .methodText {
   font-weight: 800;
-  color: #4ade80; /* A nice green for GET */
-  font-size: 0.85rem;
+  color: #10b981;
+  font-size: 0.82rem;
   letter-spacing: 0.05em;
 }
 
-.keyword { color: #c678dd; } /* Muted Purple */
-.method { color: #61afef; } /* Muted Blue */
-.string { color: #98c379; } /* Muted Green */
-.variable { color: #e5c07b; } /* Muted Yellow */
+.keyword { color: #c678dd; }
+.method { color: #61afef; }
+.string { color: #98c379; }
+.variable { color: #e5c07b; }
 
 :global(:root:not(.dark)) .keyword { color: #a626a4; }
-:global(:root:not(.dark)) .method { color: #4078f2; }
-:global(:root:not(.dark)) .string { color: #50a14f; }
-:global(:root:not(.dark)) .variable { color: #986801; }
+:global(:root:not(.dark)) .method { color: #0284c7; }
+:global(:root:not(.dark)) .string { color: #16a34a; }
+:global(:root:not(.dark)) .variable { color: #d97706; }

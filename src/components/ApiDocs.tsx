@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Copy, Check, TerminalWindow, BracketsCurly } from '@phosphor-icons/react';
 import styles from './ApiDocs.module.css';
 
@@ -45,9 +45,9 @@ export function ApiDocs() {
   return (
     <motion.div
       className={styles.apiContainer}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.4 }}
+      transition={{ duration: 0.4, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className={styles.apiHeader}>
         <div className={styles.apiTitle}>
@@ -58,7 +58,7 @@ export function ApiDocs() {
           <span className={styles.methodText}>GET</span>
           <code className={styles.url}>{apiUrl}</code>
           <button className={styles.copyBtn} onClick={handleCopy} title="Copy URL">
-            {copiedUrl ? <Check size={18} weight="bold" color="var(--success-color, #4ade80)" /> : <Copy size={18} />}
+            {copiedUrl ? <Check size={18} weight="bold" color="#10b981" /> : <Copy size={18} />}
           </button>
         </div>
       </div>
@@ -71,6 +71,13 @@ export function ApiDocs() {
               className={`${styles.tabBtn} ${activeTab === tab ? styles.activeTab : ''}`}
               onClick={() => setActiveTab(tab)}
             >
+              {activeTab === tab && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className={styles.tabIndicator}
+                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                />
+              )}
               {tab === 'fetch' ? 'JavaScript' : tab === 'python' ? 'Python' : 'cURL'}
             </button>
           ))}

@@ -137,8 +137,8 @@ export default function Scene() {
     <div id="canvas-container" style={{ width: '100%', height: '100%' }}>
       <Canvas 
         camera={{ position: [0, 0, 8], fov: 45 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: false }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       >
         {/* Transparent background to blend with Bento Cell */}
 

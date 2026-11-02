@@ -3,9 +3,10 @@
   --card-bg: #FFFFFF;
   --text-primary: #111111;
   --text-secondary: #787774;
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-strong: rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 16px 40px -6px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
   --accent-blue: #0070F3;
   --accent-red: #E00;
   
@@ -22,15 +23,16 @@
 
 .dark {
   --canvas-bg: #0A0A0A;
-  --card-bg: #141414;
+  --card-bg: #131313;
   --text-primary: #EDEDED;
   --text-secondary: #888888;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 20px 48px -6px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
 
   --scene-bg-inner: #1E1E1E;
-  --scene-bg-outer: #141414;
+  --scene-bg-outer: #131313;
   
   --selection-bg: #4a5c66;
   --selection-color: #ffffff;
@@ -59,7 +61,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Minimalist Scrollbar */
@@ -76,17 +78,4 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
-}
-
-/* Recharts Customization for Minimalist Look */
-.recharts-cartesian-axis-tick-value {
-  fill: var(--text-secondary);
-  font-size: 12px;
-  font-family: var(--font-geist-sans);
-}
-.recharts-tooltip-wrapper,
-.recharts-wrapper,
-.recharts-surface,
-.recharts-wrapper * {
-  outline: none !important;
 }
