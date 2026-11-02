@@ -421,6 +421,33 @@
   color: var(--text-primary);
 }
 
+.donateButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.donateButton:hover {
+  color: var(--text-primary);
+}
+
+.donateHeart {
+  color: #f43f5e;
+  transition: transform 0.2s ease;
+}
+
+.donateButton:hover .donateHeart {
+  transform: scale(1.2);
+}
+
 .nextUpdate {
   display: flex;
   align-items: center;

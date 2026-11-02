@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
-import { Storefront, Clock, MapPin, Moon, Sun, Tag } from '@phosphor-icons/react';
+import { Storefront, Clock, MapPin, Moon, Sun, Tag, Heart } from '@phosphor-icons/react';
 import dynamic from 'next/dynamic';
 const Scene = dynamic(() => import('@/components/Scene'), { ssr: false });
 import { ApiDocs } from '@/components/ApiDocs';
 import { StoreIcon } from '@/components/StoreIcon';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { DonateModal } from '@/components/DonateModal';
 import priceDataRaw from '../../price_history.json';
 import styles from './page.module.css';
 
@@ -244,6 +245,7 @@ function NextUpdateCountdown() {
 }
 
 export default function Home() {
+  const [isDonateOpen, setIsDonateOpen] = useState(false);
 
   const formatTimestamp = (isoTs: string) => {
     // Basic manual formatting to prevent hydration mismatch
@@ -478,6 +480,16 @@ export default function Home() {
             GitHub Repository
           </a>
           <span className={styles.footerDot}>•</span>
+          <button
+            type="button"
+            className={styles.donateButton}
+            onClick={() => setIsDonateOpen(true)}
+            title="Support the project"
+          >
+            <Heart size={16} weight="fill" className={styles.donateHeart} />
+            Donate
+          </button>
+          <span className={styles.footerDot}>•</span>
           <span>Designed & Built by <a href="https://dag.is-a.dev" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex' }}>daglaroglou</a></span>
           <span className={styles.footerDot}>•</span>
           <a href="mailto:contact@dag.is-a.dev">contact@dag.is-a.dev</a>
@@ -489,6 +501,8 @@ export default function Home() {
           </span>
         </div>
       </footer>
+
+      <DonateModal isOpen={isDonateOpen} onClose={() => setIsDonateOpen(false)} />
     </div>
   );
 }
