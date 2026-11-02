@@ -328,7 +328,7 @@ async def _fetch_and_extract(page, url):
         
     return None
 
-async def ab_vasilopoulos(page):
+async def ab(page):
     url = "https://www.ab.gr/eshop/Kava-anapsyktika-nera-xiroi-karpoi/Anapsyktika/Energeiaka-Isotonika/Energeiako-Poto-Energy-Ultra-500ml/p/7289419"
     return await _fetch_and_extract(page, url)
 
@@ -344,7 +344,7 @@ async def kritikos(page):
     url = "https://kritikos-sm.gr/products/kaba/anapsuktika/energeiaka/monster-energy-zero-ultra-500ml-705294/"
     return await _fetch_and_extract(page, url)
 
-async def market_in(page):
+async def marketin(page):
     url = "https://www.market-in.gr/el-gr/kava-anapsuktika-xumoi-md-energeiaka-pota/monster-energy-zero-ultra-kouti-500ml"
     return await _fetch_and_extract(page, url)
 
@@ -427,11 +427,11 @@ async def main_async():
                 await page.close()
                 
         tasks = {
-            "ab_vasilopoulos": asyncio.create_task(scrape_with_page(ab_vasilopoulos)),
+            "ab": asyncio.create_task(scrape_with_page(ab)),
             "galaxias": asyncio.create_task(scrape_with_page(galaxias)),
             "halkiadakis": asyncio.create_task(scrape_with_page(halkiadakis)),
             "kritikos": asyncio.create_task(scrape_with_page(kritikos)),
-            "market_in": asyncio.create_task(scrape_with_page(market_in)),
+            "marketin": asyncio.create_task(scrape_with_page(marketin)),
             "masoutis": asyncio.create_task(scrape_with_page(masoutis)),
             "mymarket": asyncio.create_task(scrape_with_page(mymarket)),
             "sklavenitis": asyncio.create_task(scrape_with_page(sklavenitis)),
@@ -442,11 +442,11 @@ async def main_async():
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
         
         names = {
-            "ab_vasilopoulos": "AB Vassilopoulos",
+            "ab": "AB Vassilopoulos",
             "galaxias": "Galaxias",
             "halkiadakis": "Halkiadakis",
             "kritikos": "Kritikos",
-            "market_in": "Market In",
+            "marketin": "Market In",
             "masoutis": "Masoutis",
             "mymarket": "MyMarket",
             "sklavenitis": "Sklavenitis",

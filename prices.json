@@ -3,7 +3,7 @@
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
-    "ab_vasilopoulos": {
+    "ab": {
       "name": "AB Vassilopoulos",
       "price": 1.14,
       "available": true,
@@ -27,7 +27,7 @@
       "available": true,
       "is_discount": false
     },
-    "market_in": {
+    "marketin": {
       "name": "Market In",
       "price": 1.15,
       "available": true,
