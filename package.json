@@ -29,6 +29,6 @@
     "eslint-config-next": "16.4.4",
     "puppeteer": "^25.16.0",
     "svg-path-bbox": "^2.1.0",
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
