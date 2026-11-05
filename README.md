@@ -135,6 +135,31 @@ curl https://dag.is-a.dev/white_monster_api/prices.json
 
 ---
 
+## 📁 Repository Structure
+
+```text
+├── .github/
+│   ├── dependabot.yml           # Dependabot updates (npm, pip, actions)
+│   └── workflows/
+│       ├── ci.yml               # Lint, build & scraper validation
+│       ├── dependabot-auto-merge.yml # Auto-merge for Dependabot updates
+│       ├── deploy-pages.yml     # Next.js static export & deploy
+│       └── update-prices.yml    # Daily price scraping cron job
+├── data/
+│   ├── prices.json              # Latest prices per store
+│   └── price_history.json       # 30-day historical prices
+├── scraper/
+│   ├── scrape_prices.py         # Playwright & BeautifulSoup scraper
+│   └── requirements.txt         # Python scraper dependencies
+├── src/
+│   ├── app/                     # Next.js App Router (pages, layout, styles)
+│   ├── components/              # React components & store icons
+│   └── types/                   # TypeScript types & interfaces
+└── public/                      # Static assets (3D model, images)
+```
+
+---
+
 ## 🧰 Tech Stack
 
 | Layer | Technology |

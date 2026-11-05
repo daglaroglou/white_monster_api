@@ -26,7 +26,7 @@ jobs:
       uses: astral-sh/setup-uv@v3
 
     - name: Install dependencies
-      run: uv pip install --system -r requirements.txt
+      run: uv pip install --system -r scraper/requirements.txt
 
     - name: Install Cloudflare WARP
       run: |
@@ -44,13 +44,13 @@ jobs:
       run: python -m playwright install chromium
 
     - name: Run price scraper
-      run: python scrape_prices.py
+      run: python scraper/scrape_prices.py
     
     - name: Commit and push if changes
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add prices.json price_history.json
+        git add data/prices.json data/price_history.json
         if ! git diff --staged --quiet; then
           timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           git commit -m "Update prices - $timestamp"

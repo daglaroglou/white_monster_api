@@ -46,8 +46,11 @@ jobs:
       
       - name: Copy API files
         run: |
-          cp prices.json out/
-          cp price_history.json out/
+          cp data/prices.json out/
+          cp data/price_history.json out/
+          mkdir -p out/data
+          cp data/prices.json out/data/
+          cp data/price_history.json out/data/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

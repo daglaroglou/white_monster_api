@@ -7,7 +7,10 @@ from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 import requests
 
-HISTORY_FILE = "price_history.json"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(BASE_DIR, "data"))
+PRICES_FILE = os.path.join(DATA_DIR, "prices.json")
+HISTORY_FILE = os.path.join(DATA_DIR, "price_history.json")
 HISTORY_DAYS = 31
 
 def parse_price_to_float(price_text):
@@ -470,9 +473,9 @@ async def main_async():
         pr = s_data.get("price")
         print(f"{s_data['name']}: €{pr:.2f}" if pr else f"{s_data['name']}: N/A")
 
-    _write_json_with_price_decimals("prices.json", prices)
+    _write_json_with_price_decimals(PRICES_FILE, prices)
     update_price_history(prices)
-    print("\nPrices saved to prices.json")
+    print(f"\nPrices saved to {PRICES_FILE}")
     print(f"Price history saved to {HISTORY_FILE}")
 
 if __name__ == "__main__":

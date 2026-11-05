@@ -7,7 +7,7 @@ try {
   if (commitSha.length > 7) {
     commitSha = commitSha.substring(0, 7);
   }
-} catch (e) {
+} catch {
   // Ignore
 }
 

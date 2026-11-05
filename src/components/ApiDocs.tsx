@@ -19,7 +19,7 @@ export function ApiDocs() {
   const codeSnippets = {
     fetch: (
       <>
-        <span className={styles.method}>fetch</span>(<span className={styles.string}>'{apiUrl}'</span>)
+        <span className={styles.method}>fetch</span>(<span className={styles.string}>&apos;{apiUrl}&apos;</span>)
         <br />
         {'  '}.<span className={styles.method}>then</span>(<span className={styles.variable}>response</span> =&gt; <span className={styles.variable}>response</span>.<span className={styles.method}>json</span>())
         <br />
@@ -30,7 +30,7 @@ export function ApiDocs() {
       <>
         <span className={styles.keyword}>import</span> requests
         <br />
-        <span className={styles.variable}>response</span> = requests.<span className={styles.method}>get</span>(<span className={styles.string}>'{apiUrl}'</span>)
+        <span className={styles.variable}>response</span> = requests.<span className={styles.method}>get</span>(<span className={styles.string}>&apos;{apiUrl}&apos;</span>)
         <br />
         <span className={styles.variable}>prices</span> = <span className={styles.variable}>response</span>.<span className={styles.method}>json</span>()
       </>
