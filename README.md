@@ -8,6 +8,8 @@
 [![License](https://img.shields.io/badge/License-MIT-111111?style=for-the-badge)](LICENSE)
 [![Prices Updated](https://img.shields.io/badge/Prices-Updated_Daily-4ade80?style=for-the-badge&logo=clockify&logoColor=white)](https://daglaroglou.github.io/white_monster_api/prices.json)
 
+[![Verified on FreeAPI](https://findfreeapi.com/api/badge/white-monster-api)](https://findfreeapi.com/en/service/white-monster-api)
+
 [**View Live →**](https://dag.is-a.dev/white_monster_api/)
 
 </div>
