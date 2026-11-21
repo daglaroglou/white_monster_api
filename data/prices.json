@@ -1,18 +1,18 @@
 {
-  "last_updated": "2026-11-20T10:58:49.002641",
+  "last_updated": "2026-11-21T10:42:44.792585",
   "product": "Monster Energy Zero Ultra 500ml",
   "currency": "EUR",
   "stores": {
     "ab": {
       "name": "AB Vassilopoulos",
-      "price": 1.10,
-      "available": true,
+      "price": null,
+      "available": false,
       "is_discount": false
     },
     "galaxias": {
       "name": "Galaxias",
-      "price": null,
-      "available": false,
+      "price": 1.52,
+      "available": true,
       "is_discount": false
     },
     "halkiadakis": {
@@ -53,8 +53,8 @@
     },
     "bazaar": {
       "name": "Bazaar",
-      "price": 1.10,
-      "available": true,
+      "price": null,
+      "available": false,
       "is_discount": false
     },
     "24hr": {
